@@ -17,4 +17,7 @@ class SalesEngine
   def merchants
     @merchants ||= MerchantRepository.new(@csv_parser.load_csv(file_path[:merchants]))
   end
+
+  def items
+    @items ||= ItemRepository.new(@csv_parser.load_csv(file_path[:items]))
 end

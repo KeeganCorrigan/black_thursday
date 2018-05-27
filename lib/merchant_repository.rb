@@ -48,7 +48,6 @@ class MerchantRepository
 
   def delete(id)
     merchant_to_delete = find_by_id(id)
-    binding.pry
-    @merchants.delete_at(merchant_to_delete)
+    @merchants.delete(merchant_to_delete)
   end
 end

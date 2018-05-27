@@ -14,4 +14,10 @@ class SalesEngineTest < Minitest::Test
     se = SalesEngine.from_csv(merchants_hash)
     assert_equal MerchantRepository, se.merchants.class
   end
+
+  def test_from_csv_creates_item_repository
+    items_hash = {:items => "./data/items.csv"}
+    se = SalesEngine.from_csv(items_hash)
+    assert_equal ItemRepository, se.merchants.class
+  end
 end
