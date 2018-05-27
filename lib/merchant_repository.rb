@@ -1,6 +1,5 @@
 require_relative 'sales_engine'
 require_relative 'merchant'
-require 'CSV'
 
 class MerchantRepository
   attr_reader :merchants
@@ -14,6 +13,10 @@ class MerchantRepository
       Merchant.new(row)
     end
   end
+
+  def inspect
+   "#<#{self.class} #{@merchants.size} rows>"
+ end
 
   def all
     @merchants
@@ -48,7 +51,6 @@ class MerchantRepository
 
   def delete(id)
     merchant_to_delete = find_by_id(id)
-    binding.pry
-    @merchants.delete_at(merchant_to_delete)
+    @merchants.delete(merchant_to_delete)
   end
 end

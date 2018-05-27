@@ -115,4 +115,15 @@ class MerchantRepositoryTest < Minitest::Test
     expected = @mr.find_by_id(12337411)
     assert_nil expected
   end
+
+  def test_delete_on_unknown_merchant_does_nothing
+    @mr.delete(1400000)
+    expected = @mr.find_by_id(1400000)
+    assert_nil expected
+  end
+
+  def test_first_returns_first_merchant
+    merchant = @mr.all.first
+    assert_equal 12334105, merchant.id
+  end
 end
