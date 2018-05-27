@@ -1,5 +1,6 @@
 require_relative 'csv_parser'
 require_relative 'merchant_repository'
+require_relative 'item_repository'
 require 'pry'
 
 class SalesEngine
@@ -20,4 +21,5 @@ class SalesEngine
 
   def items
     @items ||= ItemRepository.new(@csv_parser.load_csv(file_path[:items]))
+  end
 end

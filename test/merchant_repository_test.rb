@@ -126,6 +126,4 @@ class MerchantRepositoryTest < Minitest::Test
     merchant = @mr.all.first
     assert_equal 12334105, merchant.id
   end
-
-  def test
 end

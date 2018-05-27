@@ -1,6 +1,7 @@
 require_relative 'test_helper.rb'
 require './lib/csv_parser'
 require './lib/sales_engine'
+
 require 'pry'
 
 class SalesEngineTest < Minitest::Test
@@ -18,6 +19,6 @@ class SalesEngineTest < Minitest::Test
   def test_from_csv_creates_item_repository
     items_hash = {:items => "./data/items.csv"}
     se = SalesEngine.from_csv(items_hash)
-    assert_equal ItemRepository, se.merchants.class
+    assert_equal ItemRepository, se.items.class
   end
 end
