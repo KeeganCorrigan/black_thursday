@@ -5,12 +5,25 @@ require 'pry'
 
 class MerchantTest < Minitest::Test
   def test_it_exists
+    information = {
+                  id: 1234,
+                  name: "test",
+                  created_at: nil,
+                  updated_at: nil
+                    }
     merchant = Merchant.new(information)
     assert_instance_of(Merchant, merchant)
   end
 
   def test_it_has_attributes
-    skip
+    information = {
+                  id: 1234,
+                  name: "test",
+                  created_at: nil,
+                  updated_at: nil
+                    }
     merchant = Merchant.new(information)
-  end  
+    assert_equal 1234, merchant.id
+    assert_equal "test", merchant.name
+  end
 end

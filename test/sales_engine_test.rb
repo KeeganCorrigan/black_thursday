@@ -19,6 +19,7 @@ class SalesEngineTest < Minitest::Test
   def test_from_csv_creates_item_repository
     items_hash = {:items => "./data/items.csv"}
     se = SalesEngine.from_csv(items_hash)
+    binding.pry
     assert_equal ItemRepository, se.items.class
   end
 end
