@@ -1,10 +1,11 @@
 require_relative 'csv_parser'
 require_relative 'merchant_repository'
 require_relative 'item_repository'
+require_relative 'sales_analyst'
 require 'pry'
 
 class SalesEngine
-  attr_reader :file_path
+  attr_reader :file_path, :items, :merchants
 
   def initialize(file_path)
     @csv_parser = CsvParser.new
@@ -15,11 +16,15 @@ class SalesEngine
     SalesEngine.new(file_path)
   end
 
+  def self.analyst
+    SalesAnalyst.new(self)
+  end
+
   def merchants
-    @merchants ||= MerchantRepository.new(@csv_parser.load_csv(file_path[:merchants]))
+    @merchants ||= MerchantRepository.new(@csv_parser.load_csv(file_path[:merchants]), self)
   end
 
   def items
-    @items ||= ItemRepository.new(@csv_parser.load_csv(file_path[:items]))
+    @items ||= ItemRepository.new(@csv_parser.load_csv(file_path[:items]), self)
   end
 end

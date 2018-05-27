@@ -10,6 +10,11 @@ class SalesEngineTest < Minitest::Test
     assert_instance_of(SalesEngine, se)
   end
 
+  def test_it_analyzes
+    analyst = SalesEngine.analyst
+    assert_instance_of(SalesAnalyst, analyst)
+  end
+
   def test_from_csv_creates_merchant_repository
     merchants_hash = {:merchants => "./data/merchants.csv"}
     se = SalesEngine.from_csv(merchants_hash)
@@ -19,7 +24,6 @@ class SalesEngineTest < Minitest::Test
   def test_from_csv_creates_item_repository
     items_hash = {:items => "./data/items.csv"}
     se = SalesEngine.from_csv(items_hash)
-    binding.pry
     assert_equal ItemRepository, se.items.class
   end
 end
