@@ -7,17 +7,17 @@ require 'pry'
 class SalesEngine
   attr_reader :file_path, :items, :merchants
 
-  def initialize(file_path)
+  def initialize(file_path = nil)
     @csv_parser = CsvParser.new
     @file_path = file_path
   end
 
-  def self.from_csv(file_path)
-    SalesEngine.new(file_path)
-  end
-
   def self.analyst
     SalesAnalyst.new(self)
+  end
+
+  def self.from_csv(file_path)
+    SalesEngine.new(file_path)
   end
 
   def merchants
