@@ -5,7 +5,9 @@ require_relative 'sales_analyst'
 require 'pry'
 
 class SalesEngine
-  attr_reader :file_path, :items, :merchants
+  attr_reader :file_path,
+              :items,
+              :merchants
 
   def initialize(file_path = nil)
     @csv_parser = CsvParser.new

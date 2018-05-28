@@ -1,7 +1,13 @@
 require_relative 'sales_engine'
+require_relative 'item_repository'
+require_relative 'merchant_repository'
 
 class SalesAnalyst
-  attr_reader :parent, :items, :items_by_merchant, :merchants, :high_item_count_list
+  attr_reader :parent,
+              :items,
+              :items_by_merchant,
+              :merchants,
+              :high_item_count_list
 
   def initialize(parent)
     @parent = parent

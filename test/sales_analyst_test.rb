@@ -6,6 +6,7 @@ require 'pry'
 
 class SalesAnalystTest < Minitest::Test
   def test_it_exists
+    
     sales_engine = SalesEngine.new
     sa = SalesEngine.analyst
     assert_instance_of(SalesAnalyst, sa)

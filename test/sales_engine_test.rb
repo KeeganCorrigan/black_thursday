@@ -12,7 +12,6 @@ class SalesEngineTest < Minitest::Test
 
   def test_it_analyzes
     sales_engine = SalesEngine.new("something")
-    binding.pry
     analyst = sales_engine.analyst
     assert_instance_of(SalesAnalyst, analyst)
   end
