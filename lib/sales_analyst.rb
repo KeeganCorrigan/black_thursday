@@ -3,16 +3,14 @@ require_relative 'item_repository'
 require_relative 'merchant_repository'
 
 class SalesAnalyst
-  attr_reader :parent,
-              :items,
-              :items_by_merchant,
+  attr_reader :items,
               :merchants,
+              :items_by_merchant,
               :high_item_count_list
 
-  def initialize(parent)
-    @parent = parent
-    @items ||= get_items
-    @merchants ||= get_merchants
+  def initialize(merchants, items)
+    @items = items.items
+    @merchants = merchants.merchants
     @items_by_merchant ||= group_items
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
   end
@@ -32,7 +30,6 @@ class SalesAnalyst
       calculate_average_price(merchant_id)}.reduce(:+) / @merchants.length
     BigDecimal.new(average_price.to_f, 5)
   end
-
 
   def average_item_price_for_merchant(merchant_id)
     BigDecimal.new(calculate_average_price(merchant_id).to_f, 4)
@@ -54,16 +51,6 @@ class SalesAnalyst
         merchant_id
       end
     end.compact.uniq
-  end
-
-  def get_items
-    item_repo = parent.from_csv({:items => "./data/items.csv"})
-    item_repo.items.items
-  end
-
-  def get_merchants
-    merchant_repo = parent.from_csv({:merchants => "./data/merchants.csv"})
-    merchant_repo.merchants.merchants
   end
 
   def group_items
@@ -117,5 +104,4 @@ class SalesAnalyst
       deviation ** 2
     end
   end
-
 end

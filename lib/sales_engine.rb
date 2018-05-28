@@ -14,8 +14,8 @@ class SalesEngine
     @file_path = file_path
   end
 
-  def self.analyst
-    SalesAnalyst.new(self)
+  def analyst
+    SalesAnalyst.new(merchants, items)
   end
 
   def self.from_csv(file_path)

@@ -5,26 +5,23 @@ require './lib/sales_engine'
 require 'pry'
 
 class SalesEngineTest < Minitest::Test
+
+  def setup
+    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv"}
+    @sales_engine = SalesEngine.from_csv(data)
+  end
+
   def test_it_exists
-    se = SalesEngine.new("something")
-    assert_instance_of(SalesEngine, se)
+    assert_instance_of(SalesEngine, @sales_engine)
   end
 
   def test_it_analyzes
-    sales_engine = SalesEngine.new("something")
-    analyst = sales_engine.analyst
+    analyst = @sales_engine.analyst
     assert_instance_of(SalesAnalyst, analyst)
   end
 
-  def test_from_csv_creates_merchant_repository
-    merchants_hash = {:merchants => "./data/merchants.csv"}
-    se = SalesEngine.from_csv(merchants_hash)
-    assert_equal MerchantRepository, se.merchants.class
-  end
-
-  def test_from_csv_creates_item_repository
-    items_hash = {:items => "./data/items.csv"}
-    se = SalesEngine.from_csv(items_hash)
-    assert_equal ItemRepository, se.items.class
+  def test_it_loads_multiples_data_files
+    assert_equal ItemRepository, @sales_engine.items.class
+    assert_equal MerchantRepository, @sales_engine.merchants.class
   end
 end
