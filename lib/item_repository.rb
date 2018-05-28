@@ -4,10 +4,11 @@ require 'time'
 require 'bigdecimal'
 
 class ItemRepository
-  attr_reader :items
+  attr_reader :items, :parent
 
-  def initialize(items)
+  def initialize(items, parent)
     @items ||= create_items(items)
+    @parent = parent
   end
 
   def inspect

@@ -4,8 +4,9 @@ require_relative 'merchant'
 class MerchantRepository
   attr_reader :merchants
 
-  def initialize(merchants)
+  def initialize(merchants, parent)
     @merchants ||= create_merchant(merchants)
+    @parent = parent
   end
 
   def create_merchant(merchants)
