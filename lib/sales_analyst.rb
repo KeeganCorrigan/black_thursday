@@ -1,17 +1,22 @@
 require_relative 'sales_engine'
 require_relative 'item_repository'
 require_relative 'merchant_repository'
+require_relative 'invoice_repository'
 
 class SalesAnalyst
   attr_reader :items,
               :merchants,
+              :invoices,
               :items_by_merchant,
-              :high_item_count_list
+              :high_item_count_list,
+              :invoices_by_merchant
 
-  def initialize(merchants, items)
+  def initialize(merchants, items, invoices)
     @items = items.items
     @merchants = merchants.merchants
+    @invoices = invoices.invoices
     @items_by_merchant ||= group_items
+    @invoices_by_merchant ||= group_invoices_by_merchant
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
   end
 
@@ -63,6 +68,16 @@ class SalesAnalyst
     end
   end
 
+  def group_invoices_by_merchant
+    invoices_by_merchant = @invoices.each_with_object({}) do |invoice, accumulator|
+      if accumulator[invoice.merchant_id]
+        accumulator[invoice.merchant_id] << invoice
+      else
+        accumulator[invoice.merchant_id] = [invoice]
+      end
+    end
+  end
+
   def calculate_mean_for_items
     @items.map { |item| item.unit_price }.reduce(:+) / @items.length
   end
@@ -104,4 +119,48 @@ class SalesAnalyst
       deviation ** 2
     end
   end
+
+  def list_of_invoices_per_merchant_deviations(mean)
+    @invoices_by_merchant.map do |merchant_id, invoice|
+      invoice.count - mean
+    end
+  end
+
+  def average_invoices_per_merchant
+    BigDecimal.new((@invoices.length.to_f / @invoices_by_merchant.length), 4).to_f
+  end
+
+  def average_invoices_per_merchant_standard_deviation
+    mean = average_invoices_per_merchant
+    squares = square_deviations(list_of_invoices_per_merchant_deviations(mean))
+    sum = sum_of_deviations(squares)
+    BigDecimal.new(Math.sqrt(sum / (@invoices_by_merchant.length - 1)), 3).to_f
+  end
+
+  # def top_merchants_by_invoice_count
+  #   @invoices_by_merchant.find_all do |merchant_id, invoice|
+  #     if invoice.count > (average_invoices_per_merchant_standard_deviation * 3)
+  #       return @merchants.id == merchant_id
+  #     end
+  #   end
+  # end
 end
+
+# Who are our top performing merchants?
+# Which merchants are more than two standard deviations above the mean?
+#
+# sales_analyst.top_merchants_by_invoice_count # => [merchant, merchant, merchant]
+# Who are our lowest performing merchants?
+# Which merchants are more than two standard deviations below the mean?
+#
+# sales_analyst.bottom_merchants_by_invoice_count # => [merchant, merchant, merchant]
+# Which days of the week see the most sales?
+# On which days are invoices created at more than one standard deviation above the mean?
+#
+# sales_analyst.top_days_by_invoice_count # => ["Sunday", "Saturday"]
+# What percentage of invoices are not shipped?
+# What percentage of invoices are shipped vs pending vs returned? (takes symbol as argument)
+#
+# sales_analyst.invoice_status(:pending) # => 29.55
+# sales_analyst.invoice_status(:shipped) # => 56.95
+# sales_analyst.invoice_status(:returned) # => 13.5

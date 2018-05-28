@@ -17,7 +17,7 @@ class SalesEngine
   end
 
   def analyst
-    SalesAnalyst.new(merchants, items)
+    SalesAnalyst.new(merchants, items, invoices)
   end
 
   def self.from_csv(file_path)

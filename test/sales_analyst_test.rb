@@ -6,7 +6,7 @@ require 'pry'
 
 class SalesAnalystTest < Minitest::Test
   def setup
-    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv"}
+    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv"}
     @sales_engine = SalesEngine.from_csv(data)
     @sa = @sales_engine.analyst
   end
@@ -21,6 +21,10 @@ class SalesAnalystTest < Minitest::Test
 
   def test_it_gets_merchants
     assert_equal 475, @sa.merchants.length
+  end
+
+  def test_it_gets_invoices
+    assert_equal 4985, @sa.invoices.length
   end
 
   def test_it_groups_items_by_merchant
@@ -113,8 +117,63 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_golden_items
+    skip
     expected = @sa.golden_items
     assert_equal 5, expected.length
     assert_equal Item, expected.first.class
+  end
+
+  def test_group_invoices_by_merchant
+    expected = @sa.invoices_by_merchant
+    assert_equal 475, expected.length
+  end
+
+  def test_average_invoices_per_merchant
+    expected = @sa.average_invoices_per_merchant
+    assert_equal 10.49, expected
+    assert_equal Float, expected.class
+  end
+
+  def test_list_of_invoices_per_merchant_deviations
+    expected = @sa.list_of_invoices_per_merchant_deviations(10.49)
+    assert_equal 475, expected.length
+    assert_equal Array, expected.class
+  end
+
+  def test_average_invoices_per_merchant_standard_deviation
+    expected = @sa.average_invoices_per_merchant_standard_deviation
+    assert_equal 3.29, expected
+    assert_equal Float, expected.class
+  end
+
+  def test_top_merchants_by_invoice_count
+    skip
+    expected = @sa.top_merchants_by_invoice_count
+    assert_equal 12, expected.length
+    assert_equal Merchant, expected.first.class
+  end
+
+  def test_bottom_merchants_by_invoice_count
+    skip
+    expected = @sa.bottom_merchants_by_invoice_count
+    assert_equal 4, expected.length
+    assert_equal Merchant, expected.first.class
+  end
+
+  def test_top_days_by_invoice_count
+    skip
+    expected = @sa.top_days_by_invoice_count
+    assert_equal 1, expected.length
+    assert_equal "Wedensday", expected.first
+  end
+
+  def test_invoice_status
+    skip
+    expected = @sa.invoice_status(:pending)
+    assert_equal 29.55, expected
+    expected = @sa.invoice_status(:shipped)
+    assert_equal 56.95, expected
+    expected = @sa.invoice_status(:returned)
+    assert_equal 13.5, expected
   end
 end
