@@ -5,9 +5,8 @@ require './lib/sales_engine'
 require 'pry'
 
 class SalesEngineTest < Minitest::Test
-
   def setup
-    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv"}
+    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv", :invoice_items => "./data/invoice_items.csv", :transactions => "./data/transactions.csv"}
     @sales_engine = SalesEngine.from_csv(data)
   end
 
@@ -24,5 +23,7 @@ class SalesEngineTest < Minitest::Test
     assert_equal ItemRepository, @sales_engine.items.class
     assert_equal MerchantRepository, @sales_engine.merchants.class
     assert_equal InvoiceRepository, @sales_engine.invoices.class
+    assert_equal InvoiceItemRepository, @sales_engine.invoice_items.class
+    assert_equal TransactionRepository, @sales_engine.transactions.class
   end
 end
