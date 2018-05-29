@@ -146,7 +146,6 @@ class SalesAnalyst
 
   def top_merchants_by_invoice_count
     @merchants.find_all {|merchant| @high_invoice_count_merchants.include?(merchant.id)}
-
   end
 
   def invoices_created_by_day
