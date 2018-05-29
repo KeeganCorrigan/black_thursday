@@ -146,8 +146,12 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Float, expected.class
   end
 
+  def test_high_invoice_count_merchants
+    expected = @sa.high_invoice_count_merchants
+    assert_equal 12, expected.length
+  end
+
   def test_top_merchants_by_invoice_count
-    skip
     expected = @sa.top_merchants_by_invoice_count
     assert_equal 12, expected.length
     assert_equal Merchant, expected.first.class

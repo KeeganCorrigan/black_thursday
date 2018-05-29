@@ -2,14 +2,19 @@ require_relative 'sales_engine'
 require_relative 'item_repository'
 require_relative 'merchant_repository'
 require_relative 'invoice_repository'
+require_relative 'math_helper'
 
 class SalesAnalyst
+  include MathHelper
+
   attr_reader :items,
               :merchants,
               :invoices,
               :items_by_merchant,
               :high_item_count_list,
-              :invoices_by_merchant
+              :invoices_by_merchant,
+              :high_invoice_count_merchants,
+              :average_invoices_per_merchant_standard_deviation
 
   def initialize(merchants, items, invoices)
     @items = items.items
@@ -18,6 +23,8 @@ class SalesAnalyst
     @items_by_merchant ||= group_items
     @invoices_by_merchant ||= group_invoices_by_merchant
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
+    @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
+    @high_invoice_count_merchants ||= high_invoice_count_merchants
   end
 
   def golden_items
@@ -102,21 +109,9 @@ class SalesAnalyst
     BigDecimal.new(Math.sqrt(sum / (@items_by_merchant.length - 1)), 3).to_f
   end
 
-  def sum_of_deviations(squares)
-    squares.inject do |sum, deviation|
-      sum + deviation
-    end
-  end
-
   def list_of_deviations(mean)
     @items_by_merchant.map do |merchant_id, merchant|
       merchant.count - mean
-    end
-  end
-
-  def square_deviations(list_of_deviations)
-    list_of_deviations.map do |deviation|
-      deviation ** 2
     end
   end
 
@@ -137,18 +132,26 @@ class SalesAnalyst
     BigDecimal.new(Math.sqrt(sum / (@invoices_by_merchant.length - 1)), 3).to_f
   end
 
-  # def top_merchants_by_invoice_count
-  #   @invoices_by_merchant.find_all do |merchant_id, invoice|
-  #     if invoice.count > (average_invoices_per_merchant_standard_deviation * 3)
-  #       return @merchants.id == merchant_id
-  #     end
-  #   end
-  # end
-end
+  def high_invoice_count_merchants
+    high_invoice_merchants = []
+    @invoices_by_merchant.find_all do |merchant_id, invoice|
+      if invoice.count > (average_invoices_per_merchant + (@average_invoices_per_merchant_standard_deviation * 2))
+        high_invoice_merchants << merchant_id
+      end
+    end
+    return high_invoice_merchants
+  end
 
-# Who are our top performing merchants?
-# Which merchants are more than two standard deviations above the mean?
-#
+  def top_merchants_by_invoice_count
+    top_merchants = []
+    @merchants.map do |merchant|
+       if @high_invoice_count_merchants.include?(merchant.id)
+         top_merchants << merchant
+       end
+    end
+    return top_merchants
+  end
+end
 # sales_analyst.top_merchants_by_invoice_count # => [merchant, merchant, merchant]
 # Who are our lowest performing merchants?
 # Which merchants are more than two standard deviations below the mean?
