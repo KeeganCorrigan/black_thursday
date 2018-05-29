@@ -14,6 +14,7 @@ class SalesAnalyst
               :high_item_count_list,
               :invoices_by_merchant,
               :high_invoice_count_merchants,
+              :low_invoice_count_merchants,
               :average_invoices_per_merchant_standard_deviation
 
   def initialize(merchants, items, invoices)
@@ -25,6 +26,7 @@ class SalesAnalyst
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
     @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
     @high_invoice_count_merchants ||= high_invoice_count_merchants
+    @low_invoice_count_merchants ||= low_invoice_count_merchants
   end
 
   def golden_items
@@ -85,10 +87,6 @@ class SalesAnalyst
     end
   end
 
-  def calculate_mean_for_items
-    @items.map { |item| item.unit_price }.reduce(:+) / @items.length
-  end
-
   def deviation_list_for_items(mean)
     @items.map do |item|
       item.unit_price - mean
@@ -96,7 +94,7 @@ class SalesAnalyst
   end
 
   def standard_deviation_for_items
-    mean = calculate_mean_for_items
+    mean = calculate_mean(@items)
     squares = square_deviations(deviation_list_for_items(mean))
     sum = sum_of_deviations(squares)
     BigDecimal.new(Math.sqrt(sum / (@items.length - 1)), 3).to_f
@@ -104,21 +102,9 @@ class SalesAnalyst
 
   def average_items_per_merchant_standard_deviation
     mean = average_items_per_merchant
-    squares = square_deviations(list_of_deviations(mean))
+    squares = square_deviations(list_of_deviations(@items_by_merchant, mean))
     sum = sum_of_deviations(squares)
     BigDecimal.new(Math.sqrt(sum / (@items_by_merchant.length - 1)), 3).to_f
-  end
-
-  def list_of_deviations(mean)
-    @items_by_merchant.map do |merchant_id, merchant|
-      merchant.count - mean
-    end
-  end
-
-  def list_of_invoices_per_merchant_deviations(mean)
-    @invoices_by_merchant.map do |merchant_id, invoice|
-      invoice.count - mean
-    end
   end
 
   def average_invoices_per_merchant
@@ -127,9 +113,25 @@ class SalesAnalyst
 
   def average_invoices_per_merchant_standard_deviation
     mean = average_invoices_per_merchant
-    squares = square_deviations(list_of_invoices_per_merchant_deviations(mean))
+    squares = square_deviations(list_of_deviations(@invoices_by_merchant, mean))
     sum = sum_of_deviations(squares)
     BigDecimal.new(Math.sqrt(sum / (@invoices_by_merchant.length - 1)), 3).to_f
+  end
+
+  def low_invoice_count_merchants
+    low_invoice_merchants = []
+    @invoices_by_merchant.find_all do |merchant_id, invoice|
+      if invoice.count < (average_invoices_per_merchant - (@average_invoices_per_merchant_standard_deviation * 2))
+        low_invoice_merchants << merchant_id
+      end
+    end
+    return low_invoice_merchants
+  end
+
+  def bottom_merchants_by_invoice_count
+    @merchants.find_all do |merchant|
+       @low_invoice_count_merchants.include?(merchant.id)
+    end
   end
 
   def high_invoice_count_merchants
@@ -143,27 +145,23 @@ class SalesAnalyst
   end
 
   def top_merchants_by_invoice_count
-    top_merchants = []
-    @merchants.map do |merchant|
-       if @high_invoice_count_merchants.include?(merchant.id)
-         top_merchants << merchant
-       end
-    end
-    return top_merchants
+    @merchants.find_all {|merchant| @high_invoice_count_merchants.include?(merchant.id)}
+
+  end
+
+  def invoices_created_by_day
+    @invoices.map {|invoice| invoice.created_at.wday}
+  end
+
+  def count_invoices_created_by_day
+    invoices_created_by_day.each_with_object(Hash.new(0)) {|day,hash| hash[day] += 1}
+  end
+
+  def top_days_by_invoice_count
+    [Date::DAYNAMES[count_invoices_created_by_day.max_by {|day, value| value}.first]]
+  end
+
+  def invoice_status(status)
+    BigDecimal.new(((@invoices.find_all { |invoice| invoice.status == status}.count).to_f / (total_invoices = @invoices.length).to_f) * 100, 4)
   end
 end
-# sales_analyst.top_merchants_by_invoice_count # => [merchant, merchant, merchant]
-# Who are our lowest performing merchants?
-# Which merchants are more than two standard deviations below the mean?
-#
-# sales_analyst.bottom_merchants_by_invoice_count # => [merchant, merchant, merchant]
-# Which days of the week see the most sales?
-# On which days are invoices created at more than one standard deviation above the mean?
-#
-# sales_analyst.top_days_by_invoice_count # => ["Sunday", "Saturday"]
-# What percentage of invoices are not shipped?
-# What percentage of invoices are shipped vs pending vs returned? (takes symbol as argument)
-#
-# sales_analyst.invoice_status(:pending) # => 29.55
-# sales_analyst.invoice_status(:shipped) # => 56.95
-# sales_analyst.invoice_status(:returned) # => 13.5
