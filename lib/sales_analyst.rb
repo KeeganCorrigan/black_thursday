@@ -29,7 +29,7 @@ class SalesAnalyst
     @invoices = invoices.invoices
     @invoice_items = invoice_items.invoice_items
     @transactions = transactions.transactions
-    @items_by_merchant ||= group_items
+    @items_by_merchant ||= group_items_by_merchant
     @invoices_by_merchant ||= group_invoices_by_merchant
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
     @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
@@ -75,24 +75,12 @@ class SalesAnalyst
     end.compact.uniq
   end
 
-  def group_items
-    items_by_merchant = @items.each_with_object({}) do |item, accumulator|
-      if accumulator[item.merchant_id]
-        accumulator[item.merchant_id] << item
-      else
-        accumulator[item.merchant_id] = [item]
-      end
-    end
+  def group_items_by_merchant
+    @items.group_by{|item| item.merchant_id}
   end
 
   def group_invoices_by_merchant
-    invoices_by_merchant = @invoices.each_with_object({}) do |invoice, accumulator|
-      if accumulator[invoice.merchant_id]
-        accumulator[invoice.merchant_id] << invoice
-      else
-        accumulator[invoice.merchant_id] = [invoice]
-      end
-    end
+    @invoices.group_by {|invoice| invoice.merchant_id}
   end
 
   def deviation_list_for_items(mean)

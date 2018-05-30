@@ -1,6 +1,7 @@
 require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/item_repository'
+require './lib/repository_helper'
 require 'bigdecimal'
 require 'pry'
 
@@ -23,7 +24,7 @@ class ItemRepositoryTest < Minitest::Test
   end
 
   def test_it_creates_items_list
-    assert_equal "510+ RealPush Icon Set", @mi.items[0].name
+    assert_equal "510+ RealPush Icon Set", @mi.table[0].name
   end
 
   def test_all_returns_all_items
