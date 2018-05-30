@@ -10,7 +10,14 @@ class CsvParser
   end
 
   def load_csv(csv_file)
-    data = CSV.foreach(csv_file, headers: true, header_converters: :symbol, converters: :all).map { |row| row.to_h }
+    # REFACTOR - check header for credit_card_expiration_date to convert appropriately.
+    if csv_file.include?"transactions"
+      data = CSV.foreach(csv_file, headers: true, header_converters: :symbol).map { |row|
+          row.to_h }
+    else
+      data = CSV.foreach(csv_file, headers: true, header_converters: :symbol, converters: :all).map { |row|
+          row.to_h }
+    end
     return data
   end
 end

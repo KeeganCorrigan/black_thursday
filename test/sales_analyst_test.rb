@@ -6,7 +6,7 @@ require 'pry'
 
 class SalesAnalystTest < Minitest::Test
   def setup
-    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv"}
+    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv", :invoice_items => "./data/invoice_items.csv", :transactions => "./data/transactions.csv"}
     @sales_engine = SalesEngine.from_csv(data)
     @sa = @sales_engine.analyst
   end
@@ -25,6 +25,10 @@ class SalesAnalystTest < Minitest::Test
 
   def test_it_gets_invoices
     assert_equal 4985, @sa.invoices.length
+  end
+
+  def test_it_gets_invoice_items
+    assert_equal 21830, @sa.invoice_items.length
   end
 
   def test_it_groups_items_by_merchant
@@ -186,5 +190,24 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 56.95, expected
     expected = @sa.invoice_status(:returned)
     assert_equal 13.5, expected
+  end
+
+  def test_group_transactions_by_invoice
+    assert_equal 3145, @sa.transactions_by_invoice.length
+  end
+
+  def test_group_invoice_items_by_invoice_id
+    assert_equal 4985,
+    @sa.invoice_items_by_invoice_id.length
+  end
+
+  def test_invoice_paid_in_full
+    assert @sa.invoice_paid_in_full?(2179)
+    refute @sa.invoice_paid_in_full?(204)
+    refute @sa.invoice_paid_in_full?(7000)
+  end
+
+  def test_invoice_total
+    assert_equal 21067.77, @sa.invoice_total(1)
   end
 end
