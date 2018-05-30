@@ -64,16 +64,24 @@ class CustomerRepositoryTest < Minitest::Test
   end
 
   def test_update_updates_a_customer
-    skip
     @c.create(@attributes)
+    original_time = @c.find_by_id(1001).updated_at
     new_customer = @c.find_by_id(1001)
     new_attributes = {
                     :first_name => "Jody",
                     :last_name => "Foster",
                     }
-    expected = new_customer.update
+    @c.update(1001, new_attributes)
+    expected = @c.find_by_id(1001)
     assert_equal "Jody", expected.first_name
     assert_equal "Foster", expected.last_name
+    assert original_time < expected.updated_at
+  end
+
+  def test_deletes_removes_customer
+    @c.create(@attributes)
+    @c.delete(1001)
+    assert_nil @c.find_by_id(1001)
   end
 end
 

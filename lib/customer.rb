@@ -4,11 +4,11 @@ require_relative 'customer_repository'
 
 class Customer
   attr_accessor :first_name,
-                :last_name
+                :last_name,
+                :updated_at
 
   attr_reader   :id,
-                :created_at,
-                :updated_at
+                :created_at
 
   def initialize(information)
     @id = information[:id]

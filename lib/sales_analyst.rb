@@ -2,6 +2,8 @@ require_relative 'sales_engine'
 require_relative 'item_repository'
 require_relative 'merchant_repository'
 require_relative 'invoice_repository'
+require_relative 'invoice_item_repository'
+require_relative 'transaction_repository'
 require_relative 'math_helper'
 
 class SalesAnalyst
@@ -11,22 +13,30 @@ class SalesAnalyst
               :merchants,
               :invoices,
               :items_by_merchant,
+              :invoice_items,
+              :transactions,
               :high_item_count_list,
               :invoices_by_merchant,
               :high_invoice_count_merchants,
               :low_invoice_count_merchants,
               :average_invoices_per_merchant_standard_deviation
 
-  def initialize(merchants, items, invoices)
+  def initialize(merchants, items, invoices, invoice_items, transactions)
     @items = items.items
     @merchants = merchants.merchants
     @invoices = invoices.invoices
+    @invoice_items = invoice_items.invoice_items
+    @transactions = transactions.transactions
     @items_by_merchant ||= group_items
     @invoices_by_merchant ||= group_invoices_by_merchant
     @high_item_count_list ||= list_of_high_item_count_merchant_ids
     @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
     @high_invoice_count_merchants ||= high_invoice_count_merchants
     @low_invoice_count_merchants ||= low_invoice_count_merchants
+  end
+
+  def invoice_paid_in_full?(invoice_id)
+
   end
 
   def golden_items
@@ -40,7 +50,7 @@ class SalesAnalyst
   end
 
   def average_average_price_per_merchant
-    average_price = @items_by_merchant.map { |merchant_id, items|
+    average_price = @items_by_merchant.map {|merchant_id, items|
       calculate_average_price(merchant_id)}.reduce(:+) / @merchants.length
     BigDecimal.new(average_price.to_f, 5)
   end
@@ -50,13 +60,11 @@ class SalesAnalyst
   end
 
   def calculate_average_price(merchant_id)
-    @items_by_merchant[merchant_id].map { |item| item.unit_price}.reduce(:+) / @items_by_merchant[merchant_id].length
+    @items_by_merchant[merchant_id].map {|item| item.unit_price}.reduce(:+) / @items_by_merchant[merchant_id].length
   end
 
   def merchants_with_high_item_count
-    @merchants.find_all do |merchant|
-      @high_item_count_list.include?(merchant.id)
-    end
+    @merchants.find_all {|merchant| @high_item_count_list.include?(merchant.id)}
   end
 
   def list_of_high_item_count_merchant_ids
@@ -88,9 +96,7 @@ class SalesAnalyst
   end
 
   def deviation_list_for_items(mean)
-    @items.map do |item|
-      item.unit_price - mean
-    end
+    @items.map {|item| item.unit_price - mean}
   end
 
   def standard_deviation_for_items
@@ -129,9 +135,7 @@ class SalesAnalyst
   end
 
   def bottom_merchants_by_invoice_count
-    @merchants.find_all do |merchant|
-       @low_invoice_count_merchants.include?(merchant.id)
-    end
+    @merchants.find_all {|merchant| @low_invoice_count_merchants.include?(merchant.id)}
   end
 
   def high_invoice_count_merchants

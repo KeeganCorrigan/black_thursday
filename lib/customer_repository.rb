@@ -42,4 +42,17 @@ class CustomerRepository
     attributes[:id] = generate_id_for_new_customer
     @customers << Customer.new(attributes)
   end
+
+  def update(id, attributes)
+    return if attributes.empty?
+    customer_to_update = find_by_id(id)
+    customer_to_update.first_name = attributes[:first_name] if attributes[:first_name] != nil
+    customer_to_update.last_name = attributes[:last_name] if attributes[:last_name] != nil
+    customer_to_update.updated_at = Time.now
+  end
+
+  def delete(id)
+    customer_to_delete = find_by_id(id)
+    @customers.delete(customer_to_delete)
+  end
 end
