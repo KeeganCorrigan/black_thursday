@@ -54,5 +54,4 @@ class SalesEngine
   def customers
     @customers ||= CustomerRepository.new(@csv_parser.load_csv(file_path[:customers]))
   end
-
 end

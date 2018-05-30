@@ -206,4 +206,8 @@ class SalesAnalystTest < Minitest::Test
     refute @sa.invoice_paid_in_full?(204)
     refute @sa.invoice_paid_in_full?(7000)
   end
+
+  def test_invoice_total
+    assert_equal 21067.77, @sa.invoice_total(1)
+  end
 end

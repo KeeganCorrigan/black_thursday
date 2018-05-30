@@ -177,14 +177,13 @@ class SalesAnalyst
   end
 
   def invoice_paid_in_full?(invoice_id)
-    return false if @transactions_by_invoice[invoice_id].nil? 
+    return false if @transactions_by_invoice[invoice_id].nil?
     @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :success}
   end
-end
 
-# sales_analyst.invoice_paid_in_full?(invoice_id) returns true if the Invoice with the corresponding id is paid in full
-# sales_analyst.invoice_total(invoice_id) returns the total $ amount of the Invoice with the corresponding id.
-# Notes:
-#
-# Failed charges should never be counted in revenue totals or statistics.
-# An invoice is considered paid in full if it has a successful transaction
+  def invoice_total(invoice_id)
+    if invoice_paid_in_full?(invoice_id)
+      BigDecimal.new(@invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
+    end
+  end
+end
