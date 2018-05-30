@@ -19,6 +19,8 @@ class SalesAnalyst
               :invoices_by_merchant,
               :high_invoice_count_merchants,
               :low_invoice_count_merchants,
+              :transactions_by_invoice,
+              :invoice_items_by_invoice_id,
               :average_invoices_per_merchant_standard_deviation
 
   def initialize(merchants, items, invoices, invoice_items, transactions)
@@ -33,10 +35,8 @@ class SalesAnalyst
     @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
     @high_invoice_count_merchants ||= high_invoice_count_merchants
     @low_invoice_count_merchants ||= low_invoice_count_merchants
-  end
-
-  def invoice_paid_in_full?(invoice_id)
-
+    @transactions_by_invoice ||= group_transactions_by_invoice
+    @invoice_items_by_invoice_id ||= group_invoice_items_by_invoice_id
   end
 
   def golden_items
@@ -167,4 +167,24 @@ class SalesAnalyst
   def invoice_status(status)
     BigDecimal.new(((@invoices.find_all { |invoice| invoice.status == status}.count).to_f / (total_invoices = @invoices.length).to_f) * 100, 4)
   end
+
+  def group_transactions_by_invoice
+    @transactions.group_by {|transaction| transaction.invoice_id}
+  end
+
+  def group_invoice_items_by_invoice_id
+    @invoice_items.group_by {|invoice_item| invoice_item.invoice_id}
+  end
+
+  def invoice_paid_in_full?(invoice_id)
+    return false if @transactions_by_invoice[invoice_id].nil? 
+    @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :success}
+  end
 end
+
+# sales_analyst.invoice_paid_in_full?(invoice_id) returns true if the Invoice with the corresponding id is paid in full
+# sales_analyst.invoice_total(invoice_id) returns the total $ amount of the Invoice with the corresponding id.
+# Notes:
+#
+# Failed charges should never be counted in revenue totals or statistics.
+# An invoice is considered paid in full if it has a successful transaction

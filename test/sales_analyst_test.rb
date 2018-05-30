@@ -192,17 +192,18 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 13.5, expected
   end
 
+  def test_group_transactions_by_invoice
+    assert_equal 3145, @sa.transactions_by_invoice.length
+  end
+
+  def test_group_invoice_items_by_invoice_id
+    assert_equal 4985,
+    @sa.invoice_items_by_invoice_id.length
+  end
+
   def test_invoice_paid_in_full
-    expected = sales_analyst.invoice_paid_in_full?(1)
-    expect(expected).to eq true
-
-    expected = sales_analyst.invoice_paid_in_full?(200)
-    expect(expected).to eq true
-
-    expected = sales_analyst.invoice_paid_in_full?(203)
-    expect(expected).to eq false
-
-    expected = sales_analyst.invoice_paid_in_full?(204)
-    expect(expected).to eq false
+    assert @sa.invoice_paid_in_full?(2179)
+    refute @sa.invoice_paid_in_full?(204)
+    refute @sa.invoice_paid_in_full?(7000)
   end
 end
