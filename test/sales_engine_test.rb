@@ -6,7 +6,7 @@ require 'pry'
 
 class SalesEngineTest < Minitest::Test
   def setup
-    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv", :invoice_items => "./data/invoice_items.csv", :transactions => "./data/transactions.csv"}
+    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv", :invoice_items => "./data/invoice_items.csv", :transactions => "./data/transactions.csv", :customers => "./data/customers.csv"}
     @sales_engine = SalesEngine.from_csv(data)
   end
 
@@ -25,5 +25,6 @@ class SalesEngineTest < Minitest::Test
     assert_equal InvoiceRepository, @sales_engine.invoices.class
     assert_equal InvoiceItemRepository, @sales_engine.invoice_items.class
     assert_equal TransactionRepository, @sales_engine.transactions.class
+    assert_equal CustomerRepository, @sales_engine.customers.class
   end
 end

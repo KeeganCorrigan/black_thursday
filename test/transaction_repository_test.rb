@@ -93,10 +93,10 @@ class TransactionRepositoryTest < Minitest::Test
     assert_nil @t.find_by_id(9)
   end
 
-  def test_credit_card_expiration_rjust
-    expected = @t.find_by_id (1)
-    binding.pry
+  def test_credit_card_expiration
+    expected = @t.find_by_id(1)
     assert_equal "0217",  expected.credit_card_expiration_date
+    binding.pry
     assert_equal String, expected.credit_card_expiration_date.class
   end
 end
