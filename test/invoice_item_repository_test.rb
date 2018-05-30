@@ -4,7 +4,7 @@ require './lib/invoice_item_repository'
 require 'bigdecimal'
 require 'pry'
 
-class InvoiceRepositoryTest < Minitest::Test
+class InvoiceItemRepositoryTest < Minitest::Test
   def setup
     @attributes = {
                   :item_id => 7,

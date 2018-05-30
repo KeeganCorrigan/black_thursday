@@ -40,7 +40,6 @@ class TransactionRepositoryTest < Minitest::Test
 
   def test_find_all_by_credit_card_number
     expected = @t.find_all_by_credit_card_number("4848466917766329")
-    binding.pry
     assert_equal 1, expected.length
     assert_equal Transaction, expected.first.class
     credit_card_number = "4848466917766328"
@@ -96,7 +95,6 @@ class TransactionRepositoryTest < Minitest::Test
   def test_credit_card_expiration
     expected = @t.find_by_id(1)
     assert_equal "0217",  expected.credit_card_expiration_date
-    binding.pry
     assert_equal String, expected.credit_card_expiration_date.class
   end
 end
