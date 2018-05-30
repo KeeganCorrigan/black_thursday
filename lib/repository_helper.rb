@@ -27,4 +27,8 @@ class RepositoryHelper
   def find_by_name(name)
     @table.find { |row| row.name.downcase == name.downcase }
   end
+
+  def find_all_by_merchant_id(merchant_id)
+    @table.find_all {|row| row.merchant_id == merchant_id}
+  end
 end

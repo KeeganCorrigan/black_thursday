@@ -21,14 +21,10 @@ class InvoiceRepository < RepositoryHelper
     @invoices.find_all {|invoice| invoice.customer_id == customer_id}
   end
 
-  def find_all_by_merchant_id(merchant_id)
-    @invoices.find_all {|invoice| invoice.merchant_id == merchant_id}
-  end
-
   def find_all_by_status(status)
     @invoices.find_all {|invoice| invoice.status == status}
   end
-  
+
   def create(attributes)
     attributes[:id] = generate_new_id
     @invoices << Invoice.new(attributes)

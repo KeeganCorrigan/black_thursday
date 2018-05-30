@@ -6,8 +6,8 @@ class MerchantRepository < RepositoryHelper
   attr_reader :merchants,
               :table
 
-  def initialize(table)
-    @table ||= create_merchant(table)
+  def initialize(merchants)
+    @table ||= create_merchant(merchants)
     @merchants = @table
   end
 

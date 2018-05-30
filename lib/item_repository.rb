@@ -8,8 +8,8 @@ class ItemRepository < RepositoryHelper
   attr_reader :table,
               :items
 
-  def initialize(table)
-    @table ||= create_items(table)
+  def initialize(items)
+    @table ||= create_items(items)
     @items = @table
   end
 
@@ -29,10 +29,6 @@ class ItemRepository < RepositoryHelper
 
   def find_all_by_price_in_range(range)
     @items.find_all { |item| range.include?(item.unit_price) }
-  end
-
-  def find_all_by_merchant_id(merchant_id)
-    @items.find_all { |item| item.merchant_id == merchant_id }
   end
 
   def create(attributes)

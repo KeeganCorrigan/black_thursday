@@ -1,29 +1,19 @@
 require_relative 'sales_engine'
+require_relative 'repository_helper'
 require_relative 'transaction'
 
-class TransactionRepository
+class TransactionRepository < RepositoryHelper
   attr_reader :transactions
 
   def initialize(transactions)
-    @transactions ||= create_transaction(transactions)
+    @table ||= create_transaction(transactions)
+    @transactions = @table
   end
 
   def create_transaction(transactions)
     transactions.map do |row|
       Transaction.new(row)
     end
-  end
-
-  def inspect
-   "#<#{self.class} #{@invoices.size} rows>"
-  end
-
-  def all
-    @transactions
-  end
-
-  def find_by_id(id)
-    @transactions.find {|transaction| transaction.id == id}
   end
 
   def find_all_by_invoice_id(invoice_id)
@@ -54,10 +44,5 @@ class TransactionRepository
     transaction_to_update.credit_card_expiration_date = information[:credit_card_expiration_date] if information[:credit_card_expiration_date] != nil
     transaction_to_update.result = information[:result] if information[:result] != nil
     transaction_to_update.updated_at = Time.now
-  end
-
-  def delete(id)
-    transaction_to_delete = find_by_id(id)
-    @transactions.delete(transaction_to_delete)
   end
 end
