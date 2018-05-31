@@ -174,4 +174,22 @@ class SalesAnalyst
       BigDecimal.new(@invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
     end
   end
+
+  def group_invoices_by_date
+    @invoices.group_by {|invoice| invoice.created_at}
+  end
+
+  def find_invoice_items_by_invoice_date(date)
+    group_invoices_by_date[date].inject([]) {|invoice_ids, invoice_date| invoice_ids << invoice_date.id; invoice_ids}
+  end
+
+  def total_revenue_by_date(date)
+    invoices_by_date = find_invoice_items_by_invoice_date(date)
+    @invoice_items.inject(0) do |sum, invoice_item|
+      sum += (invoice_item.unit_price * invoice_item.quantity) if invoices_by_date.include?(invoice_item.invoice_id)
+      sum
+    end
+  end
+
+  # sales_analyst.top_revenue_earners(x) #=> [merchant, merchant, merchant, merchant, merchant]
 end

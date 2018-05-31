@@ -212,4 +212,17 @@ class SalesAnalystTest < Minitest::Test
   def test_invoice_total
     assert_equal 21067.77, @sa.invoice_total(1)
   end
+
+  def test_group_invoices_by_date
+    assert_equal 20, @sa.group_invoices_by_date.length
+    assert_equal Array, @sa.group_invoices_by_date[Time.parse("2009-02-07")].class
+  end
+
+  def test_find_invoice_ids_by_date
+    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse("2009-02-07"))
+  end
+
+  def test_total_revenue_by_date
+    assert_equal 21067.77, @sa.total_revenue_by_date(Time.parse("2009-02-07"))
+  end
 end
