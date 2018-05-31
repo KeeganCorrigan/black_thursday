@@ -191,5 +191,50 @@ class SalesAnalyst
     end
   end
 
+  def invoice_items_by_item_id_and_revenue
+    @invoice_items.inject({}) do |collector, invoice_item|
+      collector[invoice_item.item_id] = (invoice_item.unit_price * invoice_item.quantity)
+      collector
+    end
+  end
+
+  # def items_by_merchant_array
+  #   @items_by_merchant.inject([]) do |collector, merchant_items|
+  #     collector|
+  #
+  # end
+
+  def sort_merchants_by_revenue
+    hash = {}
+    revenue_by_item = invoice_items_by_item_id_and_revenue
+    @items_by_merchant.each do |merchant_id, items|
+      items.inject(0) do |sum, item|
+        if revenue_by_item[item.id] != nil
+          sum += revenue_by_item[item.id]
+          hash[merchant_id] = sum
+          sum
+        end
+      end
+    end
+    hash
+  end
+
+  def top_revenue_earners_sorted(top_merchants)
+    top_revenue_earners_sorted = sort_merchants_by_revenue.sort_by {|_merchant_id, revenue| revenue}.slice(0..(top_merchants - 1))
+  end
+
+  def top_revenue_earners(top_merchants = 20)
+    top_revenue_earners_sorted
+    top_merchant_ids = top_revenue_earners_sorted.inject([]) {|collector, merchant_id| collector << merchant_id[0]}
+  end
+
+  
+  # hash = {}
+  # hash.each_pair do |key,val|
+  #   hash[key].each do |x|
+  #     #your code, for example adding into count and total inside program scope
+  #   end
+  # end
+
   # sales_analyst.top_revenue_earners(x) #=> [merchant, merchant, merchant, merchant, merchant]
 end

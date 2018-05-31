@@ -31,7 +31,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_it_gets_invoice_items
-    assert_equal 10, @sa.invoice_items.length
+    assert_equal 20, @sa.invoice_items.length
   end
 
   def test_it_groups_items_by_merchant
@@ -224,5 +224,38 @@ class SalesAnalystTest < Minitest::Test
 
   def test_total_revenue_by_date
     assert_equal 21067.77, @sa.total_revenue_by_date(Time.parse("2009-02-07"))
+  end
+
+  def test_invoice_items_by_item_id_and_revenue
+    assert_equal 20,
+    @sa.invoice_items_by_item_id_and_revenue.length
+    assert_equal 681.75, @sa.invoice_items_by_item_id_and_revenue[1]
+  end
+
+  def test_sort_merchants_by_revenue
+    assert_equal 7,
+    @sa.sort_merchants_by_revenue.length
+    assert_equal Hash,
+    @sa.sort_merchants_by_revenue.class
+    assert_equal 2780.91, @sa.sort_merchants_by_revenue[1]
+  end
+
+  def test_top_revenue_earners
+    top_merchants = 4
+    top_revenue_earners_sorted = @sa.top_revenue_earners_sorted(top_merchants)
+    binding.pry
+    assert_equal 4,
+    top_revenue_earners_sorted.length
+    assert_equal Array,
+    top_revenue_earners_sorted.class
+    assert_equal 5, op_revenue_earners_sorted[1]
+  end
+
+  def test_top_revenue_earners
+    skip
+    top_revenue_earners = @sa.top_revenue_earners(4)
+    assert_equal 4, top_revenue_earners.length
+    assert_equal Merchant, top_revenue_earners.first.class
+    assert_equal 1, top_revenue_earners.first.merchant_id
   end
 end
