@@ -171,6 +171,11 @@ class SalesAnalyst
     @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :success}
   end
 
+  def invoice_failure_to_pay?(invoice_id)
+    return false if @transactions_by_invoice[invoice_id].nil?
+    @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :failed}
+  end
+
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
       BigDecimal.new(@invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
@@ -225,14 +230,12 @@ class SalesAnalyst
   end
 
   def merchants_with_pending_invoices
-    # off by 8, but no idea why...
-    pending_invoices = @sales_engine.invoices.find_all_by_status(:pending)
-    binding.pry
-    pending_invoices.inject([]) do |collector, invoice|
-      if collector.include?(@sales_engine.merchants.find_by_id(invoice.merchant_id)) == false && invoice_paid_in_full?(invoice.id) == false)
-        collector <<  @sales_engine.merchants.find_by_id(invoice.merchant_id)
+    # off by 10, but no idea why...
+    @invoices.inject([]) do |pending_invoices, invoice|
+      if pending_invoices.include?(@sales_engine.merchants.find_by_id(invoice.merchant_id)) == false && (invoice.status == :pending || invoice_failure_to_pay?(invoice.id) == true)
+        pending_invoices <<  @sales_engine.merchants.find_by_id(invoice.merchant_id)
       end
-      collector
+      pending_invoices
     end
   end
 
@@ -248,5 +251,10 @@ class SalesAnalyst
     top_revenue_merchant_ids.map do |merchant_id|
       @sales_engine.merchants.find_by_id(merchant_id)
     end
+  end
+
+  def revenue_by_merchant(merchant_id)
+    
+
   end
 end
