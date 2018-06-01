@@ -19,27 +19,27 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_it_gets_items
-    assert_equal 19, @sa.items.length
+    assert_equal 10, @sa.items.length
   end
 
   def test_it_gets_merchants
-    assert_equal 10, @sa.merchants.length
+    assert_equal 4, @sa.merchants.length
   end
 
   def test_it_gets_invoices
-    assert_equal 20, @sa.invoices.length
+    assert_equal 10, @sa.invoices.length
   end
 
   def test_it_gets_invoice_items
-    assert_equal 20, @sa.invoice_items.length
+    assert_equal 10, @sa.invoice_items.length
   end
 
   def test_it_groups_items_by_merchant
-    assert_equal 7, @sa.items_by_merchant.length
+    assert_equal 4, @sa.items_by_merchant.length
   end
 
   def test_average_items_per_merchant
-    assert_equal 2.71, @sa.average_items_per_merchant
+    assert_equal 2.5, @sa.average_items_per_merchant
     assert_equal Float, @sa.average_items_per_merchant.class
   end
 
@@ -47,8 +47,8 @@ class SalesAnalystTest < Minitest::Test
     mean = @sa.average_items_per_merchant
     deviations = @sa.list_of_deviations(@sa.items_by_merchant, mean)
     assert_equal Array, deviations.class
-    assert_equal 7, deviations.length
-    assert_equal -0.71, deviations[0]
+    assert_equal 4, deviations.length
+    assert_equal -0.5, deviations[0]
   end
 
   def test_square_deviations
@@ -56,8 +56,8 @@ class SalesAnalystTest < Minitest::Test
     deviations = @sa.list_of_deviations(@sa.items_by_merchant, mean)
     square_deviations = @sa.square_deviations(deviations)
     assert_equal Array, square_deviations.class
-    assert_equal 7, square_deviations.length
-    assert_equal 0.5041,  square_deviations[0]
+    assert_equal 4, square_deviations.length
+    assert_equal 0.25,  square_deviations[0]
   end
 
   def test_sum_of_deviations
@@ -66,22 +66,22 @@ class SalesAnalystTest < Minitest::Test
     square_deviations = @sa.square_deviations(deviations)
     sum = @sa.sum_of_deviations(square_deviations)
     assert_equal Float, sum.class
-    assert_equal 1.4287000000000003, sum
+    assert_equal 1.0, sum
   end
 
   def test_average_items_per_merchant_standard_deviation
     standard_deviation = @sa.average_items_per_merchant_standard_deviation
-    assert_equal 0.488, standard_deviation
+    assert_equal 0.577, standard_deviation
     assert_equal Float, standard_deviation.class
   end
 
   def test_get_list_of_high_item_count_merchant_ids
     assert_equal Array, @sa.high_item_count_list.class
-    assert_equal 7, @sa.high_item_count_list.length
+    assert_equal 4, @sa.high_item_count_list.length
   end
 
   def test_merchants_with_high_item_count
-    assert_equal 7, @sa.merchants_with_high_item_count.length
+    assert_equal 4, @sa.merchants_with_high_item_count.length
     assert_equal Merchant, @sa.merchants.first.class
   end
 
@@ -107,20 +107,20 @@ class SalesAnalystTest < Minitest::Test
 
   def test_calculate_mean_for_items
     expected = @sa.calculate_mean(@sa.items)
-    assert_equal 25.263157894736842, expected.to_f
+    assert_equal 16.0, expected.to_f
     assert_equal BigDecimal, expected.class
   end
 
   def test_deviation_list_for_items
     mean = @sa.calculate_mean(@sa.items)
     expected = @sa.deviation_list_for_items(mean)
-    assert_equal 19, expected.length
+    assert_equal 10, expected.length
     assert_equal Array, expected.class
   end
 
   def test_standard_deviation_for_items
     expected = @sa.standard_deviation_for_items
-    assert_equal 12.5, expected
+    assert_equal 5.16, expected
   end
 
   def test_golden_items
@@ -131,7 +131,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_group_invoices_by_merchant
     expected = @sa.invoices_by_merchant
-    assert_equal 8, expected.length
+    assert_equal 4, expected.length
   end
 
   def test_average_invoices_per_merchant
@@ -142,19 +142,19 @@ class SalesAnalystTest < Minitest::Test
 
   def test_average_invoices_per_merchant_standard_deviation
     expected = @sa.average_invoices_per_merchant_standard_deviation
-    assert_equal 1.2, expected
+    assert_equal 1.73, expected
     assert_equal Float, expected.class
   end
 
   def test_high_invoice_count_merchants
     expected = @sa.high_invoice_count_merchants
-    assert_equal 1, expected.length
+    assert_equal 0, expected.length
   end
 
   def test_top_merchants_by_invoice_count
     expected = @sa.top_merchants_by_invoice_count
-    assert_equal 1, expected.length
-    assert_equal Merchant, expected.first.class
+    assert_equal 0, expected.length
+    assert_equal Array, expected.class
   end
 
   def test_low_invoice_count_merchants
@@ -170,7 +170,7 @@ class SalesAnalystTest < Minitest::Test
   def test_invoices_created_by_day
     expected = @sa.invoices_created_by_day
     assert_equal Array, expected.class
-    assert_equal 20, expected.length
+    assert_equal 10, expected.length
   end
 
   def test_count_invoices_created_by_day
@@ -195,18 +195,16 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_group_transactions_by_invoice
-    assert_equal 18, @sa.transactions_by_invoice.length
+    assert_equal 10, @sa.transactions_by_invoice.length
   end
 
   def test_group_invoice_items_by_invoice_id
-    assert_equal 2,
+    assert_equal 10,
     @sa.invoice_items_by_invoice_id.length
   end
 
   def test_invoice_paid_in_full
     assert @sa.invoice_paid_in_full?(1)
-    refute @sa.invoice_paid_in_full?(2)
-    refute @sa.invoice_paid_in_full?(3)
   end
 
   def test_invoice_total
@@ -214,7 +212,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_group_invoices_by_date
-    assert_equal 20, @sa.group_invoices_by_date.length
+    assert_equal 10, @sa.group_invoices_by_date.length
     assert_equal Array, @sa.group_invoices_by_date[Time.parse("2009-02-07")].class
   end
 
@@ -226,35 +224,28 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 21067.77, @sa.total_revenue_by_date(Time.parse("2009-02-07"))
   end
 
-  def test_invoice_items_by_item_id_and_revenue
-    #double checked! This works!
-    assert_equal 20,
-    @sa.invoice_items_by_item_id_and_revenue.length
-    assert_equal 681.75, @sa.invoice_items_by_item_id_and_revenue[1]
-  end
-
   def test_merchants_with_only_one_item
     assert_equal 0, @sa.merchants_with_only_one_item.length
   end
 
   def test_merchants_with_pending_invoices
-    assert_equal 5, @sa.merchants_with_pending_invoices.length
-    binding.pry
+    assert_equal 4, @sa.merchants_with_pending_invoices.length
   end
 
-  def test_sort_merchants_by_revenue
-    assert_equal 7,
-    @sa.sort_merchants_by_revenue.length
-    assert_equal Hash,
-    @sa.sort_merchants_by_revenue.class
-    assert_equal 2780.91, @sa.sort_merchants_by_revenue[1]
+  def test_merchants_by_revenue
+    expected = @sa.merchants_by_revenue
+    binding.pry
+    assert_equal Hash, hash.class
+    assert_equal 278, hash[1].to_f
+    assert_equal 23684.11, hash[2].to_f
+    assert_equal 23684.11, hash[3].to_f
+    assert_equal 23684.11, hash[4].to_f
   end
 
   def test_top_revenue_earners
-    skip
-    top_revenue_earners = @sa.top_revenue_earners(4)
-    assert_equal 4, top_revenue_earners.length
-    assert_equal Merchant, top_revenue_earners.first.class
-    assert_equal 4, top_revenue_earners.first.id
+    expected = @sa.top_revenue_earners
+    expected Merchant, expected.first.class
+    expected 20, expected.length
+    expected 1, expected.first.id
   end
 end

@@ -168,7 +168,7 @@ class SalesAnalyst
 
   def invoice_paid_in_full?(invoice_id)
     return false if @transactions_by_invoice[invoice_id].nil?
-    @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :success}
+    @transactions_by_invoice[invoice_id].any? {|transaction| transaction.result == :success}
   end
 
   def invoice_failure_to_pay?(invoice_id)
@@ -198,36 +198,36 @@ class SalesAnalyst
     end
   end
 
-  def invoice_items_by_item_id_and_revenue
-    @invoice_items.inject({}) do |collector, invoice_item|
-      collector[invoice_item.item_id] = (invoice_item.unit_price * invoice_item.quantity)
-      collector
-    end
-  end
+  # def invoice_items_by_item_id_and_revenue
+  #   @invoice_items.inject({}) do |collector, invoice_item|
+  #     collector[invoice_item.item_id] = (invoice_item.unit_price * invoice_item.quantity)
+  #     collector
+  #   end
+  # end
 
-  def sort_merchants_by_revenue
-    hash = {}
-    revenue_by_item = invoice_items_by_item_id_and_revenue
-    @items_by_merchant.each do |merchant_id, items|
-      items.inject(0) do |sum, item|
-        sum += revenue_by_item[item.id]
-        hash[merchant_id] = sum
-        sum
-      end
-    end
-    return hash
-  end
-
-  def top_revenue_earners_sorted(top_merchants)
-    top_revenue_earners_sorted = sort_merchants_by_revenue.sort_by {|_merchant_id, revenue| revenue}
-    top_revenue_earners_sorted.reverse.slice(0..(top_merchants - 1))
-  end
-
-  def top_revenue_earners_merchant_id(top_merchants)
-    top_revenue_earners_sorted(top_merchants).inject([]) do |collector, merchant_id|
-      collector << merchant_id[0]
-    end
-  end
+  # def sort_merchants_by_revenue
+  #   hash = {}
+  #   revenue_by_item = invoice_items_by_item_id_and_revenue
+  #   @items_by_merchant.each do |merchant_id, items|
+  #     items.inject(0) do |sum, item|
+  #       sum += revenue_by_item[item.id]
+  #       hash[merchant_id] = sum
+  #       sum
+  #     end
+  #   end
+  #   return hash
+  # end
+  #
+  # def top_revenue_earners_sorted(top_merchants)
+  #   top_revenue_earners_sorted = sort_merchants_by_revenue.sort_by {|_merchant_id, revenue| revenue}
+  #   top_revenue_earners_sorted.reverse.slice(0..(top_merchants - 1))
+  # end
+  #
+  # def top_revenue_earners_merchant_id(top_merchants)
+  #   top_revenue_earners_sorted(top_merchants).inject([]) do |collector, merchant_id|
+  #     collector << merchant_id[0]
+  #   end
+  # end
 
   def merchants_with_pending_invoices
     # off by 10, but no idea why...
@@ -247,14 +247,24 @@ class SalesAnalyst
   end
 
   def top_revenue_earners(top_merchants = 20)
-    top_revenue_merchant_ids = top_revenue_earners_merchant_id(top_merchants)
+    sorted_by_revenue = merchants_by_revenue
     top_revenue_merchant_ids.map do |merchant_id|
       @sales_engine.merchants.find_by_id(merchant_id)
     end
   end
 
-  def revenue_by_merchant(merchant_id)
-    
-
+  def merchants_by_revenue
+    @invoices_by_merchant.inject({}) do |hash, (merchant_id, invoices)|
+      hash[merchant_id] = invoices.inject(0) do |sum, invoice|
+        if invoice_paid_in_full?(invoice.id) == false
+          sum += 0
+          sum
+        else
+          sum += invoice_total(invoice.id)
+          sum
+        end
+      end
+      hash
+    end
   end
 end

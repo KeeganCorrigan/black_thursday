@@ -9,12 +9,3 @@ id,name,description,unit_price,merchant_id,created_at,updated_at
 8, thing8, stuffstuff8, 2000, 3,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
 9, thing9, stuffstuff9, 2000, 4,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
 10, thing10, stuffstuff10, 2500, 4,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-11, thing11, stuffstuff11, 2500, 4,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-12, thing12, stuffstuff12, 2500, 5,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-13, thing13, stuffstuff13, 3000, 5,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-14, thing14, stuffstuff14, 3000, 5,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-15, thing15, stuffstuff15, 3000, 6,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-16, thing16, stuffstuff16, 4000, 6,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-17, thing17, stuffstuff17, 4000, 6,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-18, thing18, stuffstuff18, 5000, 7,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
-19, thing19, stuffstuff19, 5000, 7,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
