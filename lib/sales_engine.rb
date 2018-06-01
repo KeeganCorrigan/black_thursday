@@ -22,7 +22,7 @@ class SalesEngine
   end
 
   def analyst
-    SalesAnalyst.new(merchants, items, invoices, invoice_items, transactions)
+    SalesAnalyst.new(self)
   end
 
   def self.from_csv(file_path)

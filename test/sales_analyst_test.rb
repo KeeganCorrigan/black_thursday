@@ -227,9 +227,19 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_invoice_items_by_item_id_and_revenue
+    #double checked! This works!
     assert_equal 20,
     @sa.invoice_items_by_item_id_and_revenue.length
     assert_equal 681.75, @sa.invoice_items_by_item_id_and_revenue[1]
+  end
+
+  def test_merchants_with_only_one_item
+    assert_equal 0, @sa.merchants_with_only_one_item.length
+  end
+
+  def test_merchants_with_pending_invoices
+    assert_equal 5, @sa.merchants_with_pending_invoices.length
+    binding.pry
   end
 
   def test_sort_merchants_by_revenue
@@ -241,21 +251,10 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_top_revenue_earners
-    top_merchants = 4
-    top_revenue_earners_sorted = @sa.top_revenue_earners_sorted(top_merchants)
-    binding.pry
-    assert_equal 4,
-    top_revenue_earners_sorted.length
-    assert_equal Array,
-    top_revenue_earners_sorted.class
-    assert_equal 5, op_revenue_earners_sorted[1]
-  end
-
-  def test_top_revenue_earners
     skip
     top_revenue_earners = @sa.top_revenue_earners(4)
     assert_equal 4, top_revenue_earners.length
     assert_equal Merchant, top_revenue_earners.first.class
-    assert_equal 1, top_revenue_earners.first.merchant_id
+    assert_equal 4, top_revenue_earners.first.id
   end
 end
