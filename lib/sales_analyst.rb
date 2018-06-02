@@ -217,14 +217,18 @@ class SalesAnalyst
     end
   end
 
+  def merchant_start_date(merchant_id)
+    Time.parse(@sales_engine.merchants.find_by_id(merchant_id).created_at)
+  end
+
+  def convert_month_to_number(month)
+    Date::MONTHNAMES.index(month)
+  end
+
   def merchants_with_only_one_item_registered_in_month(month)
-    @sales_engine.invoices.find_all_by_merchant_id(merchant_id).find_all do |invoice|
-      if invoice.created_at.strftime("%y%m")
-        group_invoices_by_month_by_merchant(month).inject([]) do |collector, (merchant_id, invoices)|
-          if invoices.length == 1
-            collector << @sales_engine.merchants.find_by_id(merchant_id)
-          end
-      collector
+    converted_month = convert_month_to_number(month)
+    merchants_with_only_one_item.find_all do |merchant|
+      merchant.created_at.split('-')[1].to_i == converted_month
     end
   end
 
@@ -263,4 +267,7 @@ class SalesAnalyst
   def revenue_by_merchant(merchant_id)
     merchants_by_revenue[merchant_id]
   end
+
+  # (in terms of quantity sold) or, if there is a tie, [item, item, item]
+  def 
 end

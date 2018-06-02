@@ -176,7 +176,7 @@ class SalesAnalystTest < Minitest::Test
   def test_count_invoices_created_by_day
     expected = @sa.count_invoices_created_by_day
     assert_equal Hash, expected.class
-    assert_equal 5, expected.length
+    assert_equal 4, expected.length
   end
 
   def test_top_days_by_invoice_count
@@ -213,7 +213,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_group_invoices_by_date
     assert_equal 10, @sa.group_invoices_by_date.length
-    assert_equal Array, @sa.group_invoices_by_date[Time.parse("2009-02-07")].class
+    assert_equal Array, @sa.group_invoices_by_date[Time.parse("2010-12-07")].class
   end
 
   def test_find_invoice_ids_by_date
@@ -229,8 +229,11 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_with_pending_invoices
-    assert_equal 2, @sa.merchants_with_pending_invoices.length
-    binding.pry
+    assert_equal 1, @sa.merchants_with_pending_invoices.length
+  end
+
+  def test_convert_month_to_number
+    assert_equal 3, @sa.convert_month_to_number("March")
   end
 
   def test_merchants_by_revenue
@@ -273,10 +276,10 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 2780.91, expected.to_f
   end
 
-
   def test_merchants_with_only_one_item_registered_in_month
-    expected = @sa.merchants_with_only_one_item_registered_in_month(1)
-    assert_equal 4, expected.length
+    expected = @sa.merchants_with_only_one_item_registered_in_month("December")
+    assert_equal 0, expected.length
     assert_equal Array, expected.class
+    assert_equal Merchant, expected.first.class
   end
 end
