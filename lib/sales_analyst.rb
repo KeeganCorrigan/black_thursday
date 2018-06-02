@@ -172,10 +172,10 @@ class SalesAnalyst
     @transactions_by_invoice[invoice_id].any? {|transaction| transaction.result == :success}
   end
 
-  def invoice_failure_to_pay?(invoice_id)
-    return false if @transactions_by_invoice[invoice_id].nil?
-    @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :failed}
-  end
+  # def invoice_failure_to_pay?(invoice_id)
+  #   return false if @transactions_by_invoice[invoice_id].nil?
+  #   @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :failed}
+  # end
 
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
@@ -270,13 +270,34 @@ class SalesAnalyst
 
   def calculate_quantity_sold_from_item_id(item_id)
     @sales_engine.invoice_items.find_all_by_item_id(item_id).inject({}) do |collector, invoice_item|
-      if collector[item_id] != nil
-        collector[item_id] += invoice_item.quantity
-      else
-        collector[item_id] = invoice_item.quantity
+      if invoice_paid_in_full?(invoice_item.invoice_id)
+        if collector[item_id] != nil
+          collector[item_id] += invoice_item.quantity
+        else
+          collector[item_id] = invoice_item.quantity
+        end
       end
       collector
     end
+  end
+
+  def calculate_total_amount_of_revenue_from_item(item_id)
+    @sales_engine.invoice_items.find_all_by_item_id(item_id).inject({}) do |collector, invoice_item|
+      if invoice_paid_in_full?(invoice_item.invoice_id)
+        if collector[item_id] != nil
+          collector[item_id] += (invoice_item.quantity * invoice_item.unit_price)
+        else
+          collector[item_id] = (invoice_item.quantity * invoice_item.unit_price)
+        end
+      end
+      collector
+    end
+  end
+
+  def items_sold_by_merchant_by_revenue(merchant_id)
+    @sales_engine.items.find_all_by_merchant_id(merchant_id).inject([]) do |collector, item|
+      collector << calculate_total_amount_of_revenue_from_item(item.id)
+    end.inject({}, :merge)
   end
 
   def items_sold_by_merchant_by_quantity(merchant_id)
@@ -294,5 +315,9 @@ class SalesAnalyst
 
   def most_sold_item_for_merchant(merchant_id)
     find_highest_values_of_items_sold_by_merchant(items_sold_by_merchant_by_quantity(merchant_id))
+  end
+
+  def best_item_for_merchant(merchant_id)
+    find_highest_values_of_items_sold_by_merchant(items_sold_by_merchant_by_revenue(merchant_id))[0]
   end
 end

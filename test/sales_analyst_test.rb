@@ -305,12 +305,23 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_find_highest_values_of_items_sold_by_merchant
-    items_sorted = @sa.find_highest_values_of_items_sold_by_merchant(@sa.items_sold_by_merchant_by_quantity(1))
-    expected = @sa.most_sold_item_for_merchant(items_sorted)
+    expected = @sa.find_highest_values_of_items_sold_by_merchant(@sa.items_sold_by_merchant_by_quantity(1))
     assert_equal Item, expected.first.class
     assert_equal 1, expected.length
     assert_equal 2, expected.first.id
   end
 
-  def 
+  def test_calculate_total_amount_of_revenue_from_item
+    expected = @sa.calculate_total_amount_of_revenue_from_item(1)
+    assert_equal Hash, expected.class
+    assert_equal 681.75, expected[1]
+    assert_equal 1, expected.length
+  end
+
+  def test_best_item_for_merchant
+    expected = @sa.find_highest_values_of_items_sold_by_merchant(@sa.calculate_total_amount_of_revenue_from_item(1))
+    assert_equal Item, expected.first.class
+    assert_equal 1, expected.length
+    assert_equal 1, expected.first.id
+  end
 end
