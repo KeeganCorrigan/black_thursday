@@ -142,7 +142,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_average_invoices_per_merchant_standard_deviation
     expected = @sa.average_invoices_per_merchant_standard_deviation
-    assert_equal 1.73, expected
+    assert_equal 0.577, expected
     assert_equal Float, expected.class
   end
 
@@ -176,7 +176,7 @@ class SalesAnalystTest < Minitest::Test
   def test_count_invoices_created_by_day
     expected = @sa.count_invoices_created_by_day
     assert_equal Hash, expected.class
-    assert_equal 7, expected.length
+    assert_equal 5, expected.length
   end
 
   def test_top_days_by_invoice_count
@@ -234,18 +234,46 @@ class SalesAnalystTest < Minitest::Test
 
   def test_merchants_by_revenue
     expected = @sa.merchants_by_revenue
-    binding.pry
-    assert_equal Hash, hash.class
-    assert_equal 278, hash[1].to_f
-    assert_equal 23684.11, hash[2].to_f
-    assert_equal 23684.11, hash[3].to_f
-    assert_equal 23684.11, hash[4].to_f
+    assert_equal Hash, expected.class
+    assert_equal 2780.91, expected[1].to_f
+    assert_equal 8395.52, expected[2].to_f
+    assert_equal 9891.34, expected[3].to_f
+    assert_equal 74.36, expected[4].to_f
+  end
+
+
+  def test_sort_merchants_by_revenue
+    expected = @sa.sort_merchants_by_revenue
+    assert_equal 74.36, expected[4]
+    assert_equal 2780.91, expected[1]
+    assert_equal 8395.52, expected[2]
+    assert_equal 9891.34, expected[3]
   end
 
   def test_top_revenue_earners
     expected = @sa.top_revenue_earners
-    expected Merchant, expected.first.class
-    expected 20, expected.length
-    expected 1, expected.first.id
+    assert_equal Merchant, expected.first.class
+    assert_equal 4, expected.length
+    assert_equal 3, expected.first.id
+    expected = @sa.top_revenue_earners(2)
+    assert_equal Merchant, expected.first.class
+    assert_equal 2, expected.length
+    assert_equal 3, expected.first.id
+  end
+
+  def test_merchants_ranked_by_revenue
+    expected = @sa.merchants_ranked_by_revenue
+    assert_equal 4, expected.length
+    assert_equal 3, expected[0].id
+    assert_equal 4, expected[4].id
+  end
+
+  def test_revenue_by_merchant
+    expected = @sa.revenue_by_merchant(1)
+    assert_equal 2780.91, expected.to_f
+  end
+
+  def test_merchants_with_only_one_item_registered_in_month
+    expected = @sa.merchants_with_only_one_item_registered_in_month
   end
 end
