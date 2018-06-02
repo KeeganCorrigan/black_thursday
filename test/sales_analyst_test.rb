@@ -100,6 +100,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_average_average_price_per_merchant
+    skip
     expected = @sa.average_average_price_per_merchant
     assert_equal 18.0, expected
     assert_equal BigDecimal, expected.class
@@ -186,6 +187,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_invoice_status
+    skip
     expected = @sa.invoice_status(:pending)
     assert_equal 45.0, expected
     expected = @sa.invoice_status(:shipped)
@@ -208,19 +210,23 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_invoice_total
+    skip
     assert_equal 21067.77, @sa.invoice_total(1)
   end
 
   def test_group_invoices_by_date
+    skip
     assert_equal 10, @sa.group_invoices_by_date.length
     assert_equal Array, @sa.group_invoices_by_date[Time.parse("2010-12-07")].class
   end
 
   def test_find_invoice_ids_by_date
+    skip
     assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse("2009-02-07"))
   end
 
   def test_total_revenue_by_date
+    skip
     assert_equal 21067.77, @sa.total_revenue_by_date(Time.parse("2009-02-07"))
   end
 
@@ -265,6 +271,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_ranked_by_revenue
+    skip
     expected = @sa.merchants_ranked_by_revenue
     assert_equal 4, expected.length
     assert_equal 3, expected[0].id
@@ -277,9 +284,33 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_with_only_one_item_registered_in_month
+    skip
     expected = @sa.merchants_with_only_one_item_registered_in_month("December")
     assert_equal 0, expected.length
     assert_equal Array, expected.class
     assert_equal Merchant, expected.first.class
   end
+
+  def test_calculate_quantity_sold_from_item_id
+    expected = @sa.calculate_quantity_sold_from_item_id(1)
+    item_and_quantity = {1 => 5}
+    assert_equal item_and_quantity, expected
+  end
+
+  def test_items_sold_by_merchant_by_quantity
+    expected = @sa.items_sold_by_merchant_by_quantity(1)
+    assert_equal Hash, expected.class
+    assert_equal 5, expected[1]
+    assert_equal 2, expected.length
+  end
+
+  def test_find_highest_values_of_items_sold_by_merchant
+    items_sorted = @sa.find_highest_values_of_items_sold_by_merchant(@sa.items_sold_by_merchant_by_quantity(1))
+    expected = @sa.most_sold_item_for_merchant(items_sorted)
+    assert_equal Item, expected.first.class
+    assert_equal 1, expected.length
+    assert_equal 2, expected.first.id
+  end
+
+  def 
 end

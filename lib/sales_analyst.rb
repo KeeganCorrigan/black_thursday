@@ -268,6 +268,31 @@ class SalesAnalyst
     merchants_by_revenue[merchant_id]
   end
 
-  # (in terms of quantity sold) or, if there is a tie, [item, item, item]
-  def 
+  def calculate_quantity_sold_from_item_id(item_id)
+    @sales_engine.invoice_items.find_all_by_item_id(item_id).inject({}) do |collector, invoice_item|
+      if collector[item_id] != nil
+        collector[item_id] += invoice_item.quantity
+      else
+        collector[item_id] = invoice_item.quantity
+      end
+      collector
+    end
+  end
+
+  def items_sold_by_merchant_by_quantity(merchant_id)
+    @sales_engine.items.find_all_by_merchant_id(merchant_id).inject([]) do |collector, item|
+      collector << calculate_quantity_sold_from_item_id(item.id)
+    end.inject({}, :merge)
+  end
+
+  def find_highest_values_of_items_sold_by_merchant(item_quantities)
+    item_quantities.inject([]) do |collector, (item, quantity)|
+      collector << @sales_engine.items.find_by_id(item) if quantity == item_quantities.values.max
+      collector
+    end
+  end
+
+  def most_sold_item_for_merchant(merchant_id)
+    find_highest_values_of_items_sold_by_merchant(items_sold_by_merchant_by_quantity(merchant_id))
+  end
 end
