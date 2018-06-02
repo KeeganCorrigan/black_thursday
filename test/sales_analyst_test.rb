@@ -229,7 +229,8 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_with_pending_invoices
-    assert_equal 4, @sa.merchants_with_pending_invoices.length
+    assert_equal 2, @sa.merchants_with_pending_invoices.length
+    binding.pry
   end
 
   def test_merchants_by_revenue
@@ -240,7 +241,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 9891.34, expected[3].to_f
     assert_equal 74.36, expected[4].to_f
   end
-
 
   def test_sort_merchants_by_revenue
     expected = @sa.sort_merchants_by_revenue
@@ -273,7 +273,10 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 2780.91, expected.to_f
   end
 
+
   def test_merchants_with_only_one_item_registered_in_month
-    expected = @sa.merchants_with_only_one_item_registered_in_month
+    expected = @sa.merchants_with_only_one_item_registered_in_month(1)
+    assert_equal 4, expected.length
+    assert_equal Array, expected.class
   end
 end

@@ -5,6 +5,7 @@ require_relative 'invoice_repository'
 require_relative 'invoice_item_repository'
 require_relative 'transaction_repository'
 require_relative 'math_helper'
+require 'date'
 
 class SalesAnalyst
   include MathHelper
@@ -199,13 +200,14 @@ class SalesAnalyst
   end
 
   def merchants_with_pending_invoices
-    # off by 10, but no idea why...
-    @invoices.inject([]) do |pending_invoices, invoice|
-      if pending_invoices.include?(@sales_engine.merchants.find_by_id(invoice.merchant_id)) == false && (invoice.status == :pending || invoice_failure_to_pay?(invoice.id) == true)
-        pending_invoices <<  @sales_engine.merchants.find_by_id(invoice.merchant_id)
+    @invoices_by_merchant.inject([]) do |collector, (merchant_id, invoices)|
+      invoices.each do |invoice|
+        if invoice_paid_in_full?(invoice.id) == false
+          collector << @sales_engine.merchants.find_by_id(merchant_id)
+        end
       end
-      pending_invoices
-    end
+      collector
+    end.uniq
   end
 
   def merchants_with_only_one_item
@@ -216,8 +218,14 @@ class SalesAnalyst
   end
 
   def merchants_with_only_one_item_registered_in_month(month)
-    merchants_with_only_one_item
-    Date::MONTHNAMES.index("June")
+    @sales_engine.invoices.find_all_by_merchant_id(merchant_id).find_all do |invoice|
+      if invoice.created_at.strftime("%y%m")
+        group_invoices_by_month_by_merchant(month).inject([]) do |collector, (merchant_id, invoices)|
+          if invoices.length == 1
+            collector << @sales_engine.merchants.find_by_id(merchant_id)
+          end
+      collector
+    end
   end
 
   def top_revenue_earners(top_merchants = 20)
