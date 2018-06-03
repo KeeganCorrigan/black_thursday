@@ -43,7 +43,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_group_invoice_items_by_invoice_id
     assert_equal 10,
-    @sa.invoice_items_by_invoice_id.length
+    @sa.group_invoice_items_by_invoice_id.length
   end
 
   def test_average_items_per_merchant

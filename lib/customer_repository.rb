@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'sales_engine'
 require_relative 'repository_helper'
 require_relative 'customer'
@@ -18,11 +20,15 @@ class CustomerRepository < RepositoryHelper
   end
 
   def find_all_by_first_name(first_name)
-    @customers.find_all {|customer| customer.first_name.downcase.include?(first_name.downcase)}
+    @customers.find_all do |customer|
+      customer.first_name.downcase.include?(first_name.downcase)
+    end
   end
 
   def find_all_by_last_name(last_name)
-    @customers.find_all {|customer| customer.last_name.downcase.include?(last_name.downcase)}
+    @customers.find_all do |customer|
+      customer.last_name.downcase.include?(last_name.downcase)
+    end
   end
 
   def create(attributes)
@@ -32,9 +38,9 @@ class CustomerRepository < RepositoryHelper
 
   def update(id, attributes)
     return if attributes.empty?
-    customer_to_update = find_by_id(id)
-    customer_to_update.first_name = attributes[:first_name] if attributes[:first_name] != nil
-    customer_to_update.last_name = attributes[:last_name] if attributes[:last_name] != nil
-    customer_to_update.updated_at = Time.now
+    cust = find_by_id(id)
+    cust.first_name = attributes[:first_name] if !attributes[:first_name].nil?
+    cust.last_name = attributes[:last_name] if !attributes[:last_name].nil?
+    cust.updated_at = Time.now
   end
 end

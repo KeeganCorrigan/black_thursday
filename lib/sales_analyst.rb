@@ -16,8 +16,7 @@ class SalesAnalyst
               :transactions,
               :sales_engine,
               :invoices_by_merchant,
-              :transactions_by_invoice,
-              :invoice_items_by_invoice_id
+              :transactions_by_invoice
 
   def initialize(sales_engine)
     @sales_engine = sales_engine
@@ -28,7 +27,11 @@ class SalesAnalyst
     @transactions = sales_engine.transactions.transactions
     @invoices_by_merchant ||= group_invoices_by_merchant
     @transactions_by_invoice ||= group_transactions_by_invoice
-    @invoice_items_by_invoice_id ||= group_invoice_items_by_invoice_id
+  end
+
+  def invoice_paid_in_full?(invoice_id)
+    return false if @transactions_by_invoice[invoice_id].nil?
+    @transactions_by_invoice[invoice_id].any? {|transaction| transaction.result == :success}
   end
 
   def group_invoices_by_merchant
@@ -111,14 +114,9 @@ class SalesAnalyst
     InvoiceAnalyst.new(@invoices, @invoice_items).total_revenue_by_date(date)
   end
 
-  def invoice_paid_in_full?(invoice_id)
-    return false if @transactions_by_invoice[invoice_id].nil?
-    @transactions_by_invoice[invoice_id].any? {|transaction| transaction.result == :success}
-  end
-
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
-      BigDecimal.new(@invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
+      BigDecimal.new(group_invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
     end
   end
 

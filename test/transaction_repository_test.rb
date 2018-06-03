@@ -47,7 +47,7 @@ class TransactionRepositoryTest < Minitest::Test
     assert expected.empty?
   end
 
-  def find_all_by_result
+  def test_find_all_by_result
     expected = @t.find_all_by_result(:success)
     assert_equal 4158, expected.length
   end
