@@ -24,4 +24,14 @@ class MerchantInvoiceAnalystTest < Minitest::Test
     assert_equal 4, @mia.merchants.length
     assert_equal 10, @mia.invoices.length
   end
+
+  def test_high_invoice_count_merchants
+    expected = @mia.high_invoice_count_merchants
+    assert_equal 0, expected.length
+  end
+
+  def test_low_invoice_count_merchants
+    expected = @mia.low_invoice_count_merchants
+    assert_equal 0, expected.length
+  end
 end

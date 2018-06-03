@@ -121,20 +121,10 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Float, expected.class
   end
 
-  def test_high_invoice_count_merchants
-    expected = @sa.high_invoice_count_merchants
-    assert_equal 0, expected.length
-  end
-
   def test_top_merchants_by_invoice_count
     expected = @sa.top_merchants_by_invoice_count
     assert_equal 0, expected.length
     assert_equal Array, expected.class
-  end
-
-  def test_low_invoice_count_merchants
-    expected = @sa.low_invoice_count_merchants
-    assert_equal 0, expected.length
   end
 
   def test_bottom_merchants_by_invoice_count

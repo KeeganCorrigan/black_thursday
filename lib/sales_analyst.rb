@@ -15,13 +15,9 @@ class SalesAnalyst
               :invoice_items,
               :transactions,
               :sales_engine,
-              :high_item_count_list,
               :invoices_by_merchant,
-              :high_invoice_count_merchants,
-              :low_invoice_count_merchants,
               :transactions_by_invoice,
-              :invoice_items_by_invoice_id,
-              :average_invoices_per_merchant_standard_deviation
+              :invoice_items_by_invoice_id
 
   def initialize(sales_engine)
     @sales_engine = sales_engine
@@ -32,9 +28,6 @@ class SalesAnalyst
     @transactions = sales_engine.transactions.transactions
     @items_by_merchant ||= group_items_by_merchant
     @invoices_by_merchant ||= group_invoices_by_merchant
-    @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
-    @high_invoice_count_merchants ||= high_invoice_count_merchants
-    @low_invoice_count_merchants ||= low_invoice_count_merchants
     @transactions_by_invoice ||= group_transactions_by_invoice
     @invoice_items_by_invoice_id ||= group_invoice_items_by_invoice_id
   end
@@ -95,32 +88,12 @@ class SalesAnalyst
     MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).average_invoices_per_merchant_standard_deviation
   end
 
-  def low_invoice_count_merchants
-    low_invoice_merchants = []
-    @invoices_by_merchant.find_all do |merchant_id, invoice|
-      if invoice.count < (average_invoices_per_merchant - (@average_invoices_per_merchant_standard_deviation * 2))
-        low_invoice_merchants << merchant_id
-      end
-    end
-    return low_invoice_merchants
-  end
-
   def bottom_merchants_by_invoice_count
-    @merchants.find_all {|merchant| @low_invoice_count_merchants.include?(merchant.id)}
-  end
-
-  def high_invoice_count_merchants
-    high_invoice_merchants = []
-    @invoices_by_merchant.find_all do |merchant_id, invoice|
-      if invoice.count > (average_invoices_per_merchant + (@average_invoices_per_merchant_standard_deviation * 2))
-        high_invoice_merchants << merchant_id
-      end
-    end
-    return high_invoice_merchants
+    MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).bottom_merchants_by_invoice_count
   end
 
   def top_merchants_by_invoice_count
-    @merchants.find_all {|merchant| @high_invoice_count_merchants.include?(merchant.id)}
+    MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).top_merchants_by_invoice_count
   end
 
   def invoices_created_by_day
