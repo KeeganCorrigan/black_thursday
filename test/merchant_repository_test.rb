@@ -69,7 +69,7 @@ class MerchantRepositoryTest < Minitest::Test
   end
 
   def test_it_can_generate_new_id
-    expected = @mr.generate_id_for_new_merchant
+    expected = @mr.generate_new_id
     assert_equal 12337412, expected
   end
 

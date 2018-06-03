@@ -1,0 +1,11 @@
+id,name,description,unit_price,merchant_id,created_at,updated_at
+1, thing1, stuffstuff1, 1000, 1,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+2, thing2, stuffstuff2, 1000, 1,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+3, thing3, stuffstuff3, 1000, 2,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+4, thing4, stuffstuff4, 1500, 2,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+5, thing5, stuffstuff5, 1500, 2,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+6, thing6, stuffstuff6, 1500, 3,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+7, thing7, stuffstuff7, 2000, 3,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+8, thing8, stuffstuff8, 2000, 3,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+9, thing9, stuffstuff9, 2000, 4,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC
+10, thing10, stuffstuff10, 2500, 4,  2016-01-11 13:18:04 UTC,1991-03-23 07:00:03 UTC

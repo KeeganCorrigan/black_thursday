@@ -75,7 +75,7 @@ class InvoiceRepositoryTest < Minitest::Test
   end
 
   def test_it_generates_invoice_id
-    expected = @ii.generate_id_for_new_invoice
+    expected = @ii.generate_new_id
     assert_equal 4986, expected
   end
 

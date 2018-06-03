@@ -1,35 +1,22 @@
 require_relative 'sales_engine'
 require_relative 'item'
+require_relative 'repository_helper'
 require 'time'
 require 'bigdecimal'
 
-class ItemRepository
-  attr_reader :items
+class ItemRepository < RepositoryHelper
+  attr_reader :table,
+              :items
 
   def initialize(items)
-    @items ||= create_items(items)
+    @table ||= create_items(items)
+    @items = @table
   end
 
-  def inspect
-   "#<#{self.class} #{@items.size} rows>"
- end
-
-  def create_items(items)
-    items.map do |row|
+  def create_items(table)
+    table.map do |row|
       Item.new(row)
     end
-  end
-
-  def all
-    @items
-  end
-
-  def find_by_id(id)
-    @items.find { |item| item.id == id }
-  end
-
-  def find_by_name(name)
-    @items.find { |item| item.name.downcase == name.downcase }
   end
 
   def find_all_with_description(description)
@@ -44,17 +31,9 @@ class ItemRepository
     @items.find_all { |item| range.include?(item.unit_price) }
   end
 
-  def find_all_by_merchant_id(merchant_id)
-    @items.find_all { |item| item.merchant_id == merchant_id }
-  end
-
   def create(attributes)
-    attributes[:id] = generate_id_for_new_item
+    attributes[:id] = generate_new_id
     @items << Item.new(attributes)
-  end
-
-  def generate_id_for_new_item
-    (@items.max_by { |item| item.id }).id + 1
   end
 
   def update(id, attributes)
@@ -65,10 +44,5 @@ class ItemRepository
     item_to_update.name = attributes[:name] if attributes[:name] != nil
     item_to_update.description = attributes[:description] if attributes[:description] != nil
     item_to_update.updated_at = Time.now
-  end
-
-  def delete(id)
-    item_to_delete = find_by_id(id)
-    @items.delete(item_to_delete)
   end
 end
