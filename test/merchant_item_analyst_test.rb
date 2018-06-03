@@ -12,7 +12,7 @@ class MerchantItemAnalystTest < Minitest::Test
             :invoice_items => "./data/invoice_items_test.csv", :transactions => "./data/transactions_test.csv"}
   @sales_engine = SalesEngine.from_csv(data)
   @sa = @sales_engine.analyst
-  @mia = MerchantItemAnalyst.new(@sa.items_by_merchant, @sa.merchants, @sa.items, @sa.sales_engine.merchants)
+  @mia = MerchantItemAnalyst.new(@sa.merchants, @sa.items, @sa.sales_engine.merchants)
   end
 
   def test_it_exists
@@ -37,5 +37,13 @@ class MerchantItemAnalystTest < Minitest::Test
     expected = @mia.list_of_high_item_count_merchant_ids
     assert_equal Array, expected.class
     assert_equal 4, expected.length
+  end
+
+  def test_convert_month_to_number
+    assert_equal 3, @mia.convert_month_to_number("March")
+  end
+
+  def test_it_groups_items_by_merchant
+    assert_equal 4, @mia.items_by_merchant.length
   end
 end

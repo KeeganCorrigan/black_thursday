@@ -1,6 +1,7 @@
 require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/sales_analyst'
+require './lib/merchant_item_analyst'
 
 require 'pry'
 
@@ -12,6 +13,8 @@ class SalesAnalystTest < Minitest::Test
             :invoice_items => "./data/invoice_items_test.csv", :transactions => "./data/transactions_test.csv"}
     @sales_engine = SalesEngine.from_csv(data)
     @sa = @sales_engine.analyst
+    @mia = MerchantItemAnalyst.new(@sa.merchants, @sa.items)
+    @items_by_merchant = @mia.items_by_merchant
   end
 
   def test_it_exists
@@ -34,10 +37,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 10, @sa.invoice_items.length
   end
 
-  def test_it_groups_items_by_merchant
-    assert_equal 4, @sa.items_by_merchant.length
-  end
-
   def test_group_transactions_by_invoice
     assert_equal 10, @sa.transactions_by_invoice.length
   end
@@ -54,7 +53,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_list_of_deviations
     mean = @sa.average_items_per_merchant
-    deviations = @sa.list_of_deviations(@sa.items_by_merchant, mean)
+    deviations = @sa.list_of_deviations(@items_by_merchant, mean)
     assert_equal Array, deviations.class
     assert_equal 4, deviations.length
     assert_equal -0.5, deviations[0]
@@ -62,7 +61,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_square_deviations
     mean = @sa.average_items_per_merchant
-    deviations = @sa.list_of_deviations(@sa.items_by_merchant, mean)
+    deviations = @sa.list_of_deviations(@items_by_merchant, mean)
     square_deviations = @sa.square_deviations(deviations)
     assert_equal Array, square_deviations.class
     assert_equal 4, square_deviations.length
@@ -71,7 +70,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_sum_of_deviations
     mean = @sa.average_items_per_merchant
-    deviations = @sa.list_of_deviations(@sa.items_by_merchant, mean)
+    deviations = @sa.list_of_deviations(@items_by_merchant, mean)
     square_deviations = @sa.square_deviations(deviations)
     sum = @sa.sum_of_deviations(square_deviations)
     assert_equal Float, sum.class
@@ -161,24 +160,15 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_invoice_total
-    skip
-    assert_equal 21067.77, @sa.invoice_total(1)
-  end
-
-  def test_group_invoices_by_date
-    skip
-    assert_equal 10, @sa.group_invoices_by_date.length
-    assert_equal Array, @sa.group_invoices_by_date[Time.parse("2010-12-07")].class
+    assert_equal 681.75, @sa.invoice_total(1).to_f
   end
 
   def test_find_invoice_ids_by_date
-    skip
-    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse("2009-02-07"))
+    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse("2012-10-07"))
   end
 
   def test_total_revenue_by_date
-    skip
-    assert_equal 21067.77, @sa.total_revenue_by_date(Time.parse("2009-02-07"))
+    assert_equal 681.75, @sa.total_revenue_by_date(Time.parse("2012-10-07")).to_f
   end
 
   def test_merchants_with_only_one_item
@@ -187,10 +177,6 @@ class SalesAnalystTest < Minitest::Test
 
   def test_merchants_with_pending_invoices
     assert_equal 1, @sa.merchants_with_pending_invoices.length
-  end
-
-  def test_convert_month_to_number
-    assert_equal 3, @sa.convert_month_to_number("March")
   end
 
   def test_merchants_by_revenue
@@ -222,11 +208,10 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_ranked_by_revenue
-    skip
     expected = @sa.merchants_ranked_by_revenue
     assert_equal 4, expected.length
     assert_equal 3, expected[0].id
-    assert_equal 4, expected[4].id
+    assert_equal 4, expected[3].id
   end
 
   def test_revenue_by_merchant
@@ -235,11 +220,9 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_with_only_one_item_registered_in_month
-    skip
     expected = @sa.merchants_with_only_one_item_registered_in_month("December")
     assert_equal 0, expected.length
     assert_equal Array, expected.class
-    assert_equal Merchant, expected.first.class
   end
 
   def test_calculate_quantity_sold_from_item_id

@@ -12,7 +12,7 @@ class InvoiceAnalystTest < Minitest::Test
             :invoice_items => "./data/invoice_items_test.csv", :transactions => "./data/transactions_test.csv"}
   @sales_engine = SalesEngine.from_csv(data)
   @sa = @sales_engine.analyst
-  @ia = InvoiceAnalyst.new(@sa.invoices)
+  @ia = InvoiceAnalyst.new(@sa.invoices, @sa.invoice_items)
   end
 
   def test_it_has_attributes
@@ -29,5 +29,10 @@ class InvoiceAnalystTest < Minitest::Test
     expected = @ia.count_invoices_created_by_day
     assert_equal Hash, expected.class
     assert_equal 4, expected.length
+  end
+
+  def test_group_invoices_by_date
+    assert_equal 10, @ia.group_invoices_by_date.length
+    assert_equal Array, @ia.group_invoices_by_date[Time.parse("2012-10-07")].class
   end
 end

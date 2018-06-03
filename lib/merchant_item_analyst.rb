@@ -9,11 +9,16 @@ class MerchantItemAnalyst
               :merchants,
               :merchant_repo
 
-  def initialize(items_by_merchant, merchants, items, merchant_repo = nil)
+  def initialize(merchants, items, merchant_repo = nil)
     @items_by_merchant = items_by_merchant
     @merchants = merchants
     @items = items
     @merchant_repo = merchant_repo
+    @items_by_merchant ||= group_items_by_merchant
+  end
+
+  def group_items_by_merchant
+    @items.group_by{|item| item.merchant_id}
   end
 
   def average_items_per_merchant
@@ -58,5 +63,16 @@ class MerchantItemAnalyst
       collector << @merchant_repo.find_by_id(merchant_id) if items.length == 1
       collector
     end
+  end
+
+  def merchants_with_only_one_item_registered_in_month(month)
+    converted_month = convert_month_to_number(month)
+    merchants_with_only_one_item.find_all do |merchant|
+      merchant.created_at.split('-')[1].to_i == converted_month
+    end
+  end
+
+  def convert_month_to_number(month)
+    Date::MONTHNAMES.index(month)
   end
 end

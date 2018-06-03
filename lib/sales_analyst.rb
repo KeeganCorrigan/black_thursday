@@ -12,7 +12,6 @@ class SalesAnalyst
   attr_reader :items,
               :merchants,
               :invoices,
-              :items_by_merchant,
               :invoice_items,
               :transactions,
               :sales_engine,
@@ -27,14 +26,9 @@ class SalesAnalyst
     @invoices = sales_engine.invoices.invoices
     @invoice_items = sales_engine.invoice_items.invoice_items
     @transactions = sales_engine.transactions.transactions
-    @items_by_merchant ||= group_items_by_merchant
     @invoices_by_merchant ||= group_invoices_by_merchant
     @transactions_by_invoice ||= group_transactions_by_invoice
     @invoice_items_by_invoice_id ||= group_invoice_items_by_invoice_id
-  end
-
-  def group_items_by_merchant
-    @items.group_by{|item| item.merchant_id}
   end
 
   def group_invoices_by_merchant
@@ -49,10 +43,6 @@ class SalesAnalyst
     @invoice_items.group_by {|invoice_item| invoice_item.invoice_id}
   end
 
-  def group_invoices_by_date
-    @invoices.group_by {|invoice| invoice.created_at}
-  end
-
   def golden_items
     ItemAnalyst.new(@items).golden_items
   end
@@ -62,23 +52,31 @@ class SalesAnalyst
   end
 
   def average_items_per_merchant
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_items_per_merchant
+    MerchantItemAnalyst.new(@merchants, @items).average_items_per_merchant
   end
 
   def average_average_price_per_merchant
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_average_price_per_merchant
+    MerchantItemAnalyst.new(@merchants, @items).average_average_price_per_merchant
   end
 
   def average_item_price_for_merchant(merchant_id)
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_item_price_for_merchant(merchant_id)
+    MerchantItemAnalyst.new(@merchants, @items).average_item_price_for_merchant(merchant_id)
   end
 
   def merchants_with_high_item_count
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).merchants_with_high_item_count
+    MerchantItemAnalyst.new(@merchants, @items).merchants_with_high_item_count
   end
 
   def average_items_per_merchant_standard_deviation
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_items_per_merchant_standard_deviation
+    MerchantItemAnalyst.new(@merchants, @items).average_items_per_merchant_standard_deviation
+  end
+
+  def merchants_with_only_one_item
+    MerchantItemAnalyst.new(@merchants, @items, @sales_engine.merchants).merchants_with_only_one_item
+  end
+
+  def merchants_with_only_one_item_registered_in_month(month)
+    MerchantItemAnalyst.new(@merchants, @items, @sales_engine.merchants).merchants_with_only_one_item_registered_in_month(month)
   end
 
   def average_invoices_per_merchant
@@ -105,8 +103,12 @@ class SalesAnalyst
     InvoiceAnalyst.new(@invoices).invoice_status(status)
   end
 
-  def merchants_with_only_one_item
-    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items, @sales_engine.merchants).merchants_with_only_one_item
+  def find_invoice_items_by_invoice_date(date)
+    InvoiceAnalyst.new(@invoices, @invoice_items).find_invoice_items_by_invoice_date(date)
+  end
+
+  def total_revenue_by_date(date)
+    InvoiceAnalyst.new(@invoices, @invoice_items).total_revenue_by_date(date)
   end
 
   def invoice_paid_in_full?(invoice_id)
@@ -120,18 +122,6 @@ class SalesAnalyst
     end
   end
 
-  def find_invoice_items_by_invoice_date(date)
-    group_invoices_by_date[date].inject([]) {|invoice_ids, invoice_date| invoice_ids << invoice_date.id; invoice_ids}
-  end
-
-  def total_revenue_by_date(date)
-    invoices_by_date = find_invoice_items_by_invoice_date(date)
-    @invoice_items.inject(0) do |sum, invoice_item|
-      sum += (invoice_item.unit_price * invoice_item.quantity) if invoices_by_date.include?(invoice_item.invoice_id)
-      sum
-    end
-  end
-
   def merchants_with_pending_invoices
     @invoices_by_merchant.inject([]) do |collector, (merchant_id, invoices)|
       invoices.each do |invoice|
@@ -141,23 +131,6 @@ class SalesAnalyst
       end
       collector
     end.uniq
-  end
-
-
-
-  def merchant_start_date(merchant_id)
-    Time.parse(@sales_engine.merchants.find_by_id(merchant_id).created_at)
-  end
-
-  def convert_month_to_number(month)
-    Date::MONTHNAMES.index(month)
-  end
-
-  def merchants_with_only_one_item_registered_in_month(month)
-    converted_month = convert_month_to_number(month)
-    merchants_with_only_one_item.find_all do |merchant|
-      merchant.created_at.split('-')[1].to_i == converted_month
-    end
   end
 
   def top_revenue_earners(top_merchants = 20)
@@ -178,17 +151,15 @@ class SalesAnalyst
   end
 
   def merchants_by_revenue
-    @invoices_by_merchant.inject({}) do |hash, (merchant_id, invoices)|
-      hash[merchant_id] = invoices.inject(0) do |sum, invoice|
+    @invoices_by_merchant.inject({}) do |revenue_by_merchant, (merchant_id, invoices)|
+      revenue_by_merchant[merchant_id] = invoices.inject(0) do |sum, invoice|
         if invoice_paid_in_full?(invoice.id) == false
           sum += 0
-          sum
         else
           sum += invoice_total(invoice.id)
-          sum
         end
       end
-      hash
+      revenue_by_merchant
     end
   end
 
