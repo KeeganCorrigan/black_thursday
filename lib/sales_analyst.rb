@@ -1,10 +1,8 @@
 require_relative 'sales_engine'
-require_relative 'item_repository'
-require_relative 'merchant_repository'
-require_relative 'invoice_repository'
-require_relative 'invoice_item_repository'
-require_relative 'transaction_repository'
 require_relative 'math_helper'
+require_relative 'item_analyst'
+require_relative 'merchant_item_analyst'
+require_relative 'merchant_invoice_analyst'
 require 'date'
 
 class SalesAnalyst
@@ -34,48 +32,11 @@ class SalesAnalyst
     @transactions = sales_engine.transactions.transactions
     @items_by_merchant ||= group_items_by_merchant
     @invoices_by_merchant ||= group_invoices_by_merchant
-    @high_item_count_list ||= list_of_high_item_count_merchant_ids
     @average_invoices_per_merchant_standard_deviation ||= average_invoices_per_merchant_standard_deviation
     @high_invoice_count_merchants ||= high_invoice_count_merchants
     @low_invoice_count_merchants ||= low_invoice_count_merchants
     @transactions_by_invoice ||= group_transactions_by_invoice
     @invoice_items_by_invoice_id ||= group_invoice_items_by_invoice_id
-  end
-
-  def golden_items
-    @items.find_all do |item|
-      item.unit_price > (standard_deviation_for_items * 2)
-    end
-  end
-
-  def average_items_per_merchant
-    BigDecimal.new((@items.length.to_f / @items_by_merchant.length), 3).to_f
-  end
-
-  def average_average_price_per_merchant
-    average_price = @items_by_merchant.map {|merchant_id, items|
-      calculate_average_price(merchant_id)}.reduce(:+) / @merchants.length
-    BigDecimal.new(average_price.to_f, 5)
-  end
-
-  def average_item_price_for_merchant(merchant_id)
-    BigDecimal.new(calculate_average_price(merchant_id).to_f, 4)
-  end
-
-  def calculate_average_price(merchant_id)
-    @items_by_merchant[merchant_id].map {|item| item.unit_price}.reduce(:+) / @items_by_merchant[merchant_id].length
-  end
-
-  def merchants_with_high_item_count
-    @merchants.find_all {|merchant| @high_item_count_list.include?(merchant.id)}
-  end
-
-  def list_of_high_item_count_merchant_ids
-    @items_by_merchant.map do |merchant_id, merchant|
-      if merchant.count > (average_items_per_merchant_standard_deviation * 2)
-        merchant_id
-      end
-    end.compact.uniq
   end
 
   def group_items_by_merchant
@@ -86,33 +47,52 @@ class SalesAnalyst
     @invoices.group_by {|invoice| invoice.merchant_id}
   end
 
-  def deviation_list_for_items(mean)
-    @items.map {|item| item.unit_price - mean}
+  def group_transactions_by_invoice
+    @transactions.group_by {|transaction| transaction.invoice_id}
+  end
+
+  def group_invoice_items_by_invoice_id
+    @invoice_items.group_by {|invoice_item| invoice_item.invoice_id}
+  end
+
+  def group_invoices_by_date
+    @invoices.group_by {|invoice| invoice.created_at}
+  end
+
+  def golden_items
+    ItemAnalyst.new(@items).golden_items
   end
 
   def standard_deviation_for_items
-    mean = calculate_mean(@items)
-    squares = square_deviations(deviation_list_for_items(mean))
-    sum = sum_of_deviations(squares)
-    BigDecimal.new(Math.sqrt(sum / (@items.length - 1)), 3).to_f
+    ItemAnalyst.new(@items).standard_deviation_for_items
+  end
+
+  def average_items_per_merchant
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_items_per_merchant
+  end
+
+  def average_average_price_per_merchant
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_average_price_per_merchant
+  end
+
+  def average_item_price_for_merchant(merchant_id)
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_item_price_for_merchant(merchant_id)
+  end
+
+  def merchants_with_high_item_count
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).merchants_with_high_item_count
   end
 
   def average_items_per_merchant_standard_deviation
-    mean = average_items_per_merchant
-    squares = square_deviations(list_of_deviations(@items_by_merchant, mean))
-    sum = sum_of_deviations(squares)
-    BigDecimal.new(Math.sqrt(sum / (@items_by_merchant.length - 1)), 3).to_f
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items).average_items_per_merchant_standard_deviation
   end
 
   def average_invoices_per_merchant
-    BigDecimal.new((@invoices.length.to_f / @invoices_by_merchant.length), 4).to_f
+    MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).average_invoices_per_merchant
   end
 
   def average_invoices_per_merchant_standard_deviation
-    mean = average_invoices_per_merchant
-    squares = square_deviations(list_of_deviations(@invoices_by_merchant, mean))
-    sum = sum_of_deviations(squares)
-    BigDecimal.new(Math.sqrt(sum / (@invoices_by_merchant.length - 1)), 3).to_f
+    MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).average_invoices_per_merchant_standard_deviation
   end
 
   def low_invoice_count_merchants
@@ -159,32 +139,15 @@ class SalesAnalyst
     BigDecimal.new(((@invoices.find_all { |invoice| invoice.status == status}.count).to_f / (total_invoices = @invoices.length).to_f) * 100, 4)
   end
 
-  def group_transactions_by_invoice
-    @transactions.group_by {|transaction| transaction.invoice_id}
-  end
-
-  def group_invoice_items_by_invoice_id
-    @invoice_items.group_by {|invoice_item| invoice_item.invoice_id}
-  end
-
   def invoice_paid_in_full?(invoice_id)
     return false if @transactions_by_invoice[invoice_id].nil?
     @transactions_by_invoice[invoice_id].any? {|transaction| transaction.result == :success}
   end
 
-  # def invoice_failure_to_pay?(invoice_id)
-  #   return false if @transactions_by_invoice[invoice_id].nil?
-  #   @transactions_by_invoice[invoice_id].all? {|transaction| transaction.result == :failed}
-  # end
-
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
       BigDecimal.new(@invoice_items_by_invoice_id[invoice_id].inject(0) {|collector, invoice| collector += (invoice.quantity * invoice.unit_price)}, 5)
     end
-  end
-
-  def group_invoices_by_date
-    @invoices.group_by {|invoice| invoice.created_at}
   end
 
   def find_invoice_items_by_invoice_date(date)

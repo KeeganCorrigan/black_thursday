@@ -75,21 +75,9 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Float, standard_deviation.class
   end
 
-  def test_get_list_of_high_item_count_merchant_ids
-    assert_equal Array, @sa.high_item_count_list.class
-    assert_equal 4, @sa.high_item_count_list.length
-  end
-
   def test_merchants_with_high_item_count
     assert_equal 4, @sa.merchants_with_high_item_count.length
     assert_equal Merchant, @sa.merchants.first.class
-  end
-
-  def test_calculate_average_price
-    merchant_id = 1
-    expected = @sa.calculate_average_price(merchant_id)
-    assert_equal 10.0, expected.to_f
-    assert_equal BigDecimal, expected.class
   end
 
   def test_average_item_price_for_merchant
@@ -100,23 +88,9 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_average_average_price_per_merchant
-    skip
     expected = @sa.average_average_price_per_merchant
-    assert_equal 18.0, expected
+    assert_equal 16.042, expected.to_f
     assert_equal BigDecimal, expected.class
-  end
-
-  def test_calculate_mean_for_items
-    expected = @sa.calculate_mean(@sa.items)
-    assert_equal 16.0, expected.to_f
-    assert_equal BigDecimal, expected.class
-  end
-
-  def test_deviation_list_for_items
-    mean = @sa.calculate_mean(@sa.items)
-    expected = @sa.deviation_list_for_items(mean)
-    assert_equal 10, expected.length
-    assert_equal Array, expected.class
   end
 
   def test_standard_deviation_for_items
