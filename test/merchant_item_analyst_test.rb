@@ -12,7 +12,7 @@ class MerchantItemAnalystTest < Minitest::Test
             :invoice_items => "./data/invoice_items_test.csv", :transactions => "./data/transactions_test.csv"}
   @sales_engine = SalesEngine.from_csv(data)
   @sa = @sales_engine.analyst
-  @mia = MerchantItemAnalyst.new(@sa.items_by_merchant, @sa.merchants, @sa.items)
+  @mia = MerchantItemAnalyst.new(@sa.items_by_merchant, @sa.merchants, @sa.items, @sa.sales_engine.merchants)
   end
 
   def test_it_exists
@@ -23,6 +23,7 @@ class MerchantItemAnalystTest < Minitest::Test
     assert_equal 4, @mia.items_by_merchant.length
     assert_equal 4, @mia.merchants.length
     assert_equal 10, @mia.items.length
+    assert_equal MerchantRepository, @mia.merchant_repo.class
   end
 
   def test_calculate_average_price

@@ -38,6 +38,15 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 4, @sa.items_by_merchant.length
   end
 
+  def test_group_transactions_by_invoice
+    assert_equal 10, @sa.transactions_by_invoice.length
+  end
+
+  def test_group_invoice_items_by_invoice_id
+    assert_equal 10,
+    @sa.invoice_items_by_invoice_id.length
+  end
+
   def test_average_items_per_merchant
     assert_equal 2.5, @sa.average_items_per_merchant
     assert_equal Float, @sa.average_items_per_merchant.class
@@ -132,18 +141,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 0, expected.length
   end
 
-  def test_invoices_created_by_day
-    expected = @sa.invoices_created_by_day
-    assert_equal Array, expected.class
-    assert_equal 10, expected.length
-  end
-
-  def test_count_invoices_created_by_day
-    expected = @sa.count_invoices_created_by_day
-    assert_equal Hash, expected.class
-    assert_equal 4, expected.length
-  end
-
   def test_top_days_by_invoice_count
     expected = @sa.top_days_by_invoice_count
     assert_equal 1, expected.length
@@ -151,22 +148,12 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_invoice_status
-    skip
     expected = @sa.invoice_status(:pending)
-    assert_equal 45.0, expected
+    assert_equal 60.0, expected.to_f
     expected = @sa.invoice_status(:shipped)
-    assert_equal 50.0, expected
+    assert_equal 40.0, expected.to_f
     expected = @sa.invoice_status(:returned)
-    assert_equal 5.0, expected
-  end
-
-  def test_group_transactions_by_invoice
-    assert_equal 10, @sa.transactions_by_invoice.length
-  end
-
-  def test_group_invoice_items_by_invoice_id
-    assert_equal 10,
-    @sa.invoice_items_by_invoice_id.length
+    assert_equal 0.0, expected.to_f
   end
 
   def test_invoice_paid_in_full

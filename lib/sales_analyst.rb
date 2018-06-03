@@ -1,6 +1,7 @@
 require_relative 'sales_engine'
 require_relative 'math_helper'
 require_relative 'item_analyst'
+require_relative 'invoice_analyst'
 require_relative 'merchant_item_analyst'
 require_relative 'merchant_invoice_analyst'
 require 'date'
@@ -96,20 +97,16 @@ class SalesAnalyst
     MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices).top_merchants_by_invoice_count
   end
 
-  def invoices_created_by_day
-    @invoices.map {|invoice| invoice.created_at.wday}
-  end
-
-  def count_invoices_created_by_day
-    invoices_created_by_day.each_with_object(Hash.new(0)) {|day,hash| hash[day] += 1}
-  end
-
   def top_days_by_invoice_count
-    [Date::DAYNAMES[count_invoices_created_by_day.max_by {|day, value| value}.first]]
+    InvoiceAnalyst.new(@invoices).top_days_by_invoice_count
   end
 
   def invoice_status(status)
-    BigDecimal.new(((@invoices.find_all { |invoice| invoice.status == status}.count).to_f / (total_invoices = @invoices.length).to_f) * 100, 4)
+    InvoiceAnalyst.new(@invoices).invoice_status(status)
+  end
+
+  def merchants_with_only_one_item
+    MerchantItemAnalyst.new(@items_by_merchant, @merchants, @items, @sales_engine.merchants).merchants_with_only_one_item
   end
 
   def invoice_paid_in_full?(invoice_id)
@@ -146,12 +143,7 @@ class SalesAnalyst
     end.uniq
   end
 
-  def merchants_with_only_one_item
-    @items_by_merchant.inject([]) do |collector, (merchant_id, items)|
-      collector << @sales_engine.merchants.find_by_id(merchant_id) if items.length == 1
-      collector
-    end
-  end
+
 
   def merchant_start_date(merchant_id)
     Time.parse(@sales_engine.merchants.find_by_id(merchant_id).created_at)

@@ -6,12 +6,14 @@ class MerchantItemAnalyst
 
   attr_reader :items,
               :items_by_merchant,
-              :merchants
+              :merchants,
+              :merchant_repo
 
-  def initialize(items_by_merchant, merchants, items)
+  def initialize(items_by_merchant, merchants, items, merchant_repo = nil)
     @items_by_merchant = items_by_merchant
     @merchants = merchants
     @items = items
+    @merchant_repo = merchant_repo
   end
 
   def average_items_per_merchant
@@ -49,5 +51,12 @@ class MerchantItemAnalyst
     squares = square_deviations(list_of_deviations(@items_by_merchant, mean))
     sum = sum_of_deviations(squares)
     BigDecimal.new(Math.sqrt(sum / (@items_by_merchant.length - 1)), 3).to_f
+  end
+
+  def merchants_with_only_one_item
+    @items_by_merchant.inject([]) do |collector, (merchant_id, items)|
+      collector << @merchant_repo.find_by_id(merchant_id) if items.length == 1
+      collector
+    end
   end
 end
