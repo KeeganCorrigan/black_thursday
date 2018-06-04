@@ -4,6 +4,7 @@ require_relative 'item_analyst'
 require_relative 'invoice_analyst'
 require_relative 'merchant_item_analyst'
 require_relative 'merchant_invoice_analyst'
+require 'bigdecimal'
 require 'date'
 
 class SalesAnalyst

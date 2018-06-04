@@ -1,3 +1,6 @@
+require 'bigdecimal'
+require 'time'
+
 class RepositoryHelper
   def initialize(table)
     @table = table
