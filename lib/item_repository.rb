@@ -1,8 +1,8 @@
+# frozen_string_literal: true
+
 require_relative 'sales_engine'
 require_relative 'item'
 require_relative 'repository_helper'
-require 'time'
-require 'bigdecimal'
 
 class ItemRepository < RepositoryHelper
   attr_reader :table,
@@ -20,11 +20,13 @@ class ItemRepository < RepositoryHelper
   end
 
   def find_all_with_description(description)
-    @items.find_all { |item| item.description.downcase.include?(description.downcase) }
+    @items.find_all do |item|
+      item.description.downcase.include?(description.downcase)
+    end
   end
 
   def find_all_by_price(price)
-    @items.find_all { |item| (item.unit_price) == price }
+    @items.find_all { |item| item.unit_price == price }
   end
 
   def find_all_by_price_in_range(range)
@@ -36,13 +38,13 @@ class ItemRepository < RepositoryHelper
     @items << Item.new(attributes)
   end
 
-  def update(id, attributes)
-    return if attributes.empty?
-    item_to_update = find_by_id(id)
-    item_to_update.created_at = item_to_update.created_at
-    item_to_update.unit_price = attributes[:unit_price] if attributes[:unit_price] != nil
-    item_to_update.name = attributes[:name] if attributes[:name] != nil
-    item_to_update.description = attributes[:description] if attributes[:description] != nil
-    item_to_update.updated_at = Time.now
+  def update(id, data)
+    return if data.empty?
+    item = find_by_id(id)
+    item.created_at = item.created_at
+    item.unit_price = data[:unit_price] unless data[:unit_price].nil?
+    item.name = data[:name] unless data[:name].nil?
+    item.description = data[:description] unless data[:description].nil?
+    item.updated_at = Time.now
   end
 end

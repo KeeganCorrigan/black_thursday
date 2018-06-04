@@ -1,12 +1,12 @@
-require 'bigdecimal'
-require 'time'
+# frozen_string_literal: true
+
 require_relative 'item_repository'
 require_relative 'data_helper'
 
 class Item
   include DataHelper
 
-    attr_reader :id,
+  attr_reader   :id,
                 :merchant_id
 
   attr_accessor :name,
@@ -19,12 +19,12 @@ class Item
     @id = information[:id]
     @name = information[:name]
     @description = information[:description]
-    @unit_price = (BigDecimal.new(information[:unit_price])) / 100
+    @unit_price = BigDecimal(information[:unit_price]) / 100
     @merchant_id = information[:merchant_id]
     @created_at = convert_time(information[:created_at])
     @updated_at = convert_time(information[:updated_at])
   end
-  
+
   def unit_price_to_dollars
     @unit_price.to_f
   end
