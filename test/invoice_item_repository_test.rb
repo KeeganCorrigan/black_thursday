@@ -131,9 +131,7 @@ class InvoiceItemRepositoryTest < Minitest::Test
   def test_update
     @ii.create(@attributes)
     original_time = @ii.find_by_id(11).updated_at
-      attributes = {
-        quantity: 13
-      }
+    attributes = { quantity: 13 }
     @ii.update(11, attributes)
     expected = @ii.find_by_id(11)
     assert_equal 13, expected.quantity

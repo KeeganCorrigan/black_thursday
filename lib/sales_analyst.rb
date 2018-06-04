@@ -8,6 +8,7 @@ require_relative 'merchant_item_analyst'
 require_relative 'merchant_invoice_analyst'
 require 'bigdecimal'
 require 'date'
+require 'pry'
 
 class SalesAnalyst
   include MathHelper
@@ -30,7 +31,6 @@ class SalesAnalyst
     @transactions = sales_engine.transactions.transactions
     @invoices_by_merchant ||= group_invoices_by_merchant
     @transactions_by_invoice ||= group_transactions_by_invoice
-    @sales_engine.items
   end
 
   def invoice_paid_in_full?(invoice_id)
@@ -190,7 +190,7 @@ class SalesAnalyst
         if invoice_paid_in_full?(invoice.id)
           sum += invoice_total(invoice.id)
         else
-          sum += 0
+          sum
         end
       end
       revenue
@@ -201,64 +201,62 @@ class SalesAnalyst
     merchants_by_revenue[merchant_id]
   end
 
-  def calculate_quantity_sold_from_item_id(item_id)
-    @sales_engine.invoice_items.find_all_by_item_id(item_id)
-                 .each_with_object({}) do |invoice_item, sold|
-      if invoice_paid_in_full?(invoice_item.invoice_id)
-        if !sold[item_id].nil?
-          sold[item_id] += invoice_item.quantity
-        else
-          sold[item_id] = invoice_item.quantity
-        end
-      end
+  def find_paid_invoices_per_merchant(merchant_id)
+    @sales_engine.invoices.find_all_by_merchant_id(merchant_id).find_all do |invoice|
+      invoice_paid_in_full?(invoice.id)
+    end
+  end
+
+  def find_invoices_by_invoice_id(invoice_by_merchant)
+    invoice_by_merchant.map do |invoice|
+      @sales_engine.invoice_items.find_all_by_invoice_id(invoice.id)
+    end.flatten
+  end
+
+  def find_item_quantities_sold_by_merchant(paid_invoice_items)
+    paid_invoice_items.inject(Hash.new(0)) do |sold, invoice|
+      sold[invoice.item_id] += invoice.quantity
       sold
     end
   end
 
-  def calculate_total_amount_of_revenue_from_item(id)
-    @sales_engine.invoice_items.find_all_by_item_id(id)
-                 .each_with_object({}) do |invoice_item, revenue|
-      if invoice_paid_in_full?(invoice_item.invoice_id)
-        if !revenue[id].nil?
-          revenue[id] += (invoice_item.quantity * invoice_item.unit_price)
-        else
-          revenue[id] = (invoice_item.quantity * invoice_item.unit_price)
-        end
-      end
+  def find_item_revenue_sold_by_merchant(paid_invoice_items)
+    paid_invoice_items.inject(Hash.new(0)) do |sold, invoice|
+      sold[invoice.item_id] += invoice.quantity * invoice.unit_price
+      sold
+    end
+  end
+
+  def calculate_best_selling_item_by_merchant(items_for_merchant)
+    items_for_merchant.each_with_object([]) do |(item, quantity), items|
+      items << @sales_engine.items.find_by_id(item) if quantity == items_for_merchant.values.max
+      items
+    end
+  end
+
+#   def largest_hash_key(hash)
+#   hash.max_by{|k,v| v}
+# end
+
+  def calculate_highest_revenue_item_by_merchant(revenue_by_item)
+    revenue_by_item.max_by do |item_id, revenue|
       revenue
     end
   end
 
-  def items_sold_by_merchant_by_revenue(id)
-    @sales_engine.items.find_all_by_merchant_id(id).inject([]) do |sold, item|
-      sold << calculate_total_amount_of_revenue_from_item(item.id)
-    end.inject({}, :merge)
-  end
-
-  def items_sold_by_merchant_by_quantity(id)
-    @sales_engine.items.find_all_by_merchant_id(id).inject([]) do |sold, item|
-      sold << calculate_quantity_sold_from_item_id(item.id)
-    end.inject({}, :merge)
-  end
-
-  def find_highest_values_of_items_sold_by_merchant(item_quantities)
-    item_quantities.each_with_object([]) do |(item, quantity), collector|
-      if quantity == item_quantities.values.max
-        collector << @sales_engine.items.find_by_id(item)
-      end
-      collector
-    end
-  end
-
   def most_sold_item_for_merchant(merchant_id)
-    find_highest_values_of_items_sold_by_merchant(
-      items_sold_by_merchant_by_quantity(merchant_id)
-    )
+    invoice_by_merchant = find_paid_invoices_per_merchant(merchant_id)
+    paid_invoice_items = find_invoices_by_invoice_id(invoice_by_merchant)
+    items_for_merchant = find_item_quantities_sold_by_merchant(paid_invoice_items)
+    calculate_best_selling_item_by_merchant(items_for_merchant)
   end
 
   def best_item_for_merchant(merchant_id)
-    find_highest_values_of_items_sold_by_merchant(
-      items_sold_by_merchant_by_revenue(merchant_id)
-    )[0]
+    invoice_by_merchant = find_paid_invoices_per_merchant(merchant_id)
+    paid_invoice_items = find_invoices_by_invoice_id(invoice_by_merchant)
+    revenue_by_item = find_item_revenue_sold_by_merchant(paid_invoice_items)
+    highest_earning_item_id = calculate_highest_revenue_item_by_merchant(revenue_by_item)
+    binding.pry
+    @sales_engine.items.find_by_id(highest_earning_item_id[0])
   end
 end
