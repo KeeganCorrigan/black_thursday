@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'transaction_repository'
 require_relative 'data_helper'
 
