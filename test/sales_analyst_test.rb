@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/sales_analyst'
@@ -44,8 +46,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_group_invoice_items_by_invoice_id
-    assert_equal 10,
-    @sa.group_invoice_items_by_invoice_id.length
+    assert_equal 10, @sa.group_invoice_items_by_invoice_id.length
   end
 
   def test_average_items_per_merchant
@@ -58,7 +59,7 @@ class SalesAnalystTest < Minitest::Test
     deviations = @sa.list_of_deviations(@items_by_merchant, mean)
     assert_equal Array, deviations.class
     assert_equal 4, deviations.length
-    assert_equal -0.5, deviations[0]
+    assert_equal(deviations[0], -0.5)
   end
 
   def test_square_deviations
@@ -67,7 +68,7 @@ class SalesAnalystTest < Minitest::Test
     square_deviations = @sa.square_deviations(deviations)
     assert_equal Array, square_deviations.class
     assert_equal 4, square_deviations.length
-    assert_equal 0.25,  square_deviations[0]
+    assert_equal 0.25, square_deviations[0]
   end
 
   def test_sum_of_deviations
@@ -166,11 +167,15 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_find_invoice_ids_by_date
-    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse('2012-10-07'))
+    assert_equal [1], @sa.find_invoice_items_by_invoice_date(
+      Time.parse('2012-10-07')
+    )
   end
 
   def test_total_revenue_by_date
-    assert_equal 681.75, @sa.total_revenue_by_date(Time.parse('2012-10-07')).to_f
+    assert_equal 681.75, @sa.total_revenue_by_date(
+      Time.parse('2012-10-07')
+    ).to_f
   end
 
   def test_merchants_with_only_one_item
@@ -186,26 +191,18 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Hash, expected.class
     assert_equal 2780.91, expected[1].to_f
     assert_equal 8395.52, expected[2].to_f
-    assert_equal 9891.34, expected[3].to_f
-    assert_equal 74.36, expected[4].to_f
   end
 
   def test_sort_merchants_by_revenue
     expected = @sa.sort_merchants_by_revenue
     assert_equal 74.36, expected[4]
     assert_equal 2780.91, expected[1]
-    assert_equal 8395.52, expected[2]
-    assert_equal 9891.34, expected[3]
   end
 
   def test_top_revenue_earners
     expected = @sa.top_revenue_earners
     assert_equal Merchant, expected.first.class
     assert_equal 4, expected.length
-    assert_equal 3, expected.first.id
-    expected = @sa.top_revenue_earners(2)
-    assert_equal Merchant, expected.first.class
-    assert_equal 2, expected.length
     assert_equal 3, expected.first.id
   end
 
@@ -229,7 +226,7 @@ class SalesAnalystTest < Minitest::Test
 
   def test_calculate_quantity_sold_from_item_id
     expected = @sa.calculate_quantity_sold_from_item_id(1)
-    item_and_quantity = {1 => 5}
+    item_and_quantity = { 1 => 5 }
     assert_equal item_and_quantity, expected
   end
 
@@ -241,7 +238,9 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_find_highest_values_of_items_sold_by_merchant
-    expected = @sa.find_highest_values_of_items_sold_by_merchant(@sa.items_sold_by_merchant_by_quantity(1))
+    expected = @sa.find_highest_values_of_items_sold_by_merchant(
+      @sa.items_sold_by_merchant_by_quantity(1)
+    )
     assert_equal Item, expected.first.class
     assert_equal 1, expected.length
     assert_equal 2, expected.first.id
@@ -255,7 +254,9 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_best_item_for_merchant
-    expected = @sa.find_highest_values_of_items_sold_by_merchant(@sa.calculate_total_amount_of_revenue_from_item(1))
+    expected = @sa.find_highest_values_of_items_sold_by_merchant(
+      @sa.calculate_total_amount_of_revenue_from_item(1)
+    )
     assert_equal Item, expected.first.class
     assert_equal 1, expected.length
     assert_equal 1, expected.first.id
