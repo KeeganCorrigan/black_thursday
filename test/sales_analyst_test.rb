@@ -3,14 +3,16 @@ require './lib/sales_engine'
 require './lib/sales_analyst'
 require './lib/merchant_item_analyst'
 
-require 'pry'
-
 class SalesAnalystTest < Minitest::Test
   def setup
-    data = {:merchants => "./data/merchants_test.csv",
-            :items => "./data/items_test.csv",
-            :invoices => "./data/invoices_test.csv",
-            :invoice_items => "./data/invoice_items_test.csv", :transactions => "./data/transactions_test.csv"}
+    data =
+      {
+        merchants: './data/merchants_test.csv',
+        items: './data/items_test.csv',
+        invoices: './data/invoices_test.csv',
+        invoice_items: './data/invoice_items_test.csv',
+        transactions: './data/transactions_test.csv'
+      }
     @sales_engine = SalesEngine.from_csv(data)
     @sa = @sales_engine.analyst
     @mia = MerchantItemAnalyst.new(@sa.merchants, @sa.items)
@@ -143,7 +145,7 @@ class SalesAnalystTest < Minitest::Test
   def test_top_days_by_invoice_count
     expected = @sa.top_days_by_invoice_count
     assert_equal 1, expected.length
-    assert_equal "Friday", expected.first
+    assert_equal 'Friday', expected.first
   end
 
   def test_invoice_status
@@ -164,11 +166,11 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_find_invoice_ids_by_date
-    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse("2012-10-07"))
+    assert_equal [1], @sa.find_invoice_items_by_invoice_date(Time.parse('2012-10-07'))
   end
 
   def test_total_revenue_by_date
-    assert_equal 681.75, @sa.total_revenue_by_date(Time.parse("2012-10-07")).to_f
+    assert_equal 681.75, @sa.total_revenue_by_date(Time.parse('2012-10-07')).to_f
   end
 
   def test_merchants_with_only_one_item
@@ -220,7 +222,7 @@ class SalesAnalystTest < Minitest::Test
   end
 
   def test_merchants_with_only_one_item_registered_in_month
-    expected = @sa.merchants_with_only_one_item_registered_in_month("December")
+    expected = @sa.merchants_with_only_one_item_registered_in_month('December')
     assert_equal 0, expected.length
     assert_equal Array, expected.class
   end

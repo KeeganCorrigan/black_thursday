@@ -185,15 +185,15 @@ class SalesAnalyst
   end
 
   def merchants_by_revenue
-    @invoices_by_merchant.inject({}) do |revenue_by_merchant, (merchant_id, invoices)|
-      revenue_by_merchant[merchant_id] = invoices.inject(0) do |sum, invoice|
-        if invoice_paid_in_full?(invoice.id) == false
-          sum += 0
-        else
+    @invoices_by_merchant.each_with_object({}) do |(id, invoices), revenue|
+      revenue[id] = invoices.inject(0) do |sum, invoice|
+        if invoice_paid_in_full?(invoice.id)
           sum += invoice_total(invoice.id)
+        else
+          sum += 0
         end
       end
-      revenue_by_merchant
+      revenue
     end
   end
 
@@ -202,22 +202,24 @@ class SalesAnalyst
   end
 
   def calculate_quantity_sold_from_item_id(item_id)
-    @sales_engine.invoice_items.find_all_by_item_id(item_id).inject({}) do |collector, invoice_item|
+    @sales_engine.invoice_items.find_all_by_item_id(item_id)
+                 .each_with_object({}) do |invoice_item, sold|
       if invoice_paid_in_full?(invoice_item.invoice_id)
-        if collector[item_id] != nil
-          collector[item_id] += invoice_item.quantity
+        if !sold[item_id].nil?
+          sold[item_id] += invoice_item.quantity
         else
-          collector[item_id] = invoice_item.quantity
+          sold[item_id] = invoice_item.quantity
         end
       end
-      collector
+      sold
     end
   end
 
   def calculate_total_amount_of_revenue_from_item(id)
-    @sales_engine.invoice_items.find_all_by_item_id(id).inject({}) do |revenue, invoice_item|
+    @sales_engine.invoice_items.find_all_by_item_id(id)
+                 .each_with_object({}) do |invoice_item, revenue|
       if invoice_paid_in_full?(invoice_item.invoice_id)
-        if revenue[id] != nil
+        if !revenue[id].nil?
           revenue[id] += (invoice_item.quantity * invoice_item.unit_price)
         else
           revenue[id] = (invoice_item.quantity * invoice_item.unit_price)
