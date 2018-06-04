@@ -1,9 +1,15 @@
-require 'bigdecimal'
-require 'time'
+# frozen_string_literal: true
+
 require_relative 'invoice_repository'
+require_relative 'data_helper.rb'
 
 class Invoice
-  attr_reader :id, :customer_id, :merchant_id, :created_at
+  include DataHelper
+
+  attr_reader :id,
+              :customer_id,
+              :merchant_id,
+              :created_at
 
   attr_accessor :status, :updated_at
 
@@ -14,13 +20,5 @@ class Invoice
     @status = information[:status].to_sym
     @created_at = convert_time(information[:created_at])
     @updated_at = convert_time(information[:updated_at])
-  end
-
-  def convert_time(time)
-    if time.class == String
-      Time.parse(time)
-    else
-      return time
-    end
   end
 end

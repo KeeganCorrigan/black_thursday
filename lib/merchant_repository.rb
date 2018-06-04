@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'sales_engine'
 require_relative 'repository_helper'
 require_relative 'merchant'
@@ -18,7 +20,9 @@ class MerchantRepository < RepositoryHelper
   end
 
   def find_all_by_name(name)
-    @merchants.find_all { |merchant| merchant.name.downcase.include?(name.downcase) }
+    @merchants.find_all do |merchant|
+      merchant.name.downcase.include?(name.downcase)
+    end
   end
 
   def create(attributes)

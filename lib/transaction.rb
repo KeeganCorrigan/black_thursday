@@ -1,8 +1,11 @@
-require 'bigdecimal'
-require 'time'
+# frozen_string_literal: true
+
 require_relative 'transaction_repository'
+require_relative 'data_helper'
 
 class Transaction
+  include DataHelper
+
   attr_reader   :id,
                 :invoice_id,
                 :created_at
@@ -20,13 +23,5 @@ class Transaction
     @result = information[:result].to_sym
     @created_at = convert_time(information[:created_at])
     @updated_at = convert_time(information[:updated_at])
-  end
-
-  def convert_time(time)
-    if time.class == String
-      Time.parse(time)
-    else
-      return time
-    end
   end
 end

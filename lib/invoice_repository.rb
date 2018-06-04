@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'sales_engine'
 require_relative 'repository_helper'
 require_relative 'invoice'
@@ -18,11 +20,11 @@ class InvoiceRepository < RepositoryHelper
   end
 
   def find_all_by_customer_id(customer_id)
-    @invoices.find_all {|invoice| invoice.customer_id == customer_id}
+    @invoices.find_all { |invoice| invoice.customer_id == customer_id }
   end
 
   def find_all_by_status(status)
-    @invoices.find_all {|invoice| invoice.status == status}
+    @invoices.find_all { |invoice| invoice.status == status }
   end
 
   def create(attributes)

@@ -1,8 +1,9 @@
-require 'bigdecimal'
-require 'time'
 require_relative 'customer_repository'
+require_relative 'data_helper'
 
 class Customer
+  include DataHelper
+
   attr_accessor :first_name,
                 :last_name,
                 :updated_at
@@ -16,13 +17,5 @@ class Customer
     @last_name = information[:last_name]
     @created_at = convert_time(information[:created_at])
     @updated_at = convert_time(information[:updated_at])
-  end
-
-  def convert_time(time)
-    if time.class == String
-      Time.parse(time)
-    else
-      return time
-    end
   end
 end
