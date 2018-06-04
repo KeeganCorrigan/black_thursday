@@ -41,10 +41,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 10, @sa.invoice_items.length
   end
 
-  def test_group_transactions_by_invoice
-    assert_equal 10, @sa.transactions_by_invoice.length
-  end
-
   def test_group_invoice_items_by_invoice_id
     assert_equal 10, @sa.group_invoice_items_by_invoice_id.length
   end
@@ -224,16 +220,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Array, expected.class
   end
 
-  def test_best_item_for_merchant
-    skip
-    expected = @sa.find_highest_values_of_items_sold_by_merchant(
-      @sa.calculate_total_amount_of_revenue_from_item(1)
-    )
-    assert_equal Item, expected.first.class
-    assert_equal 1, expected.length
-    assert_equal 1, expected.first.id
-  end
-
   def test_find_paid_invoices_per_merchant
     expected = @sa.find_paid_invoices_per_merchant(1)
     assert_equal 2, expected.length
@@ -260,12 +246,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 2, expected[0].id
   end
 
-  def test_best_item_for_merchant
-    expected = @sa.best_item_for_merchant(1)
-    assert_equal Item, expected.class
-    assert_equal 2, expected.id
-  end
-
   def test_find_item_revenue_sold_by_merchant
     invoice_per_merchant = @sa.find_paid_invoices_per_merchant(1)
     invoice_id = @sa.find_invoices_by_invoice_id(invoice_per_merchant)
@@ -278,5 +258,11 @@ class SalesAnalystTest < Minitest::Test
     expected = @sa.calculate_highest_revenue_item_by_merchant(items)
     assert_equal 987.60, expected[1]
     assert_equal 2, expected.length
+  end
+
+  def test_best_item_for_merchant
+    expected = @sa.best_item_for_merchant(1)
+    assert_equal Item, expected.class
+    assert_equal 2, expected.id
   end
 end

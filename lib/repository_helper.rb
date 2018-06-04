@@ -9,7 +9,7 @@ class RepositoryHelper
   end
 
   def inspect
-    "#<#{self.class} #{@items.size} rows>"
+    "#<#{self.class} #{@table.size} rows>"
   end
 
   def all
