@@ -1,9 +1,8 @@
+# frozen_string_literal: true
+
 module DataHelper
   def convert_time(time)
-    if time.class == String
-      Time.parse(time)
-    else
-      return time
-    end
+    return time unless time.class == String
+    Time.parse(time)
   end
 end
