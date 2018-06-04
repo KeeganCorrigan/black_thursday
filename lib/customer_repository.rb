@@ -36,11 +36,11 @@ class CustomerRepository < RepositoryHelper
     @customers << Customer.new(attributes)
   end
 
-  def update(id, attributes)
-    return if attributes.empty?
+  def update(id, data)
+    return if data.empty?
     cust = find_by_id(id)
-    cust.first_name = attributes[:first_name] if !attributes[:first_name].nil?
-    cust.last_name = attributes[:last_name] if !attributes[:last_name].nil?
+    cust.first_name = data[:first_name] unless data[:first_name].nil?
+    cust.last_name = data[:last_name] unless data[:last_name].nil?
     cust.updated_at = Time.now
   end
 end

@@ -1,12 +1,20 @@
+# frozen_string_literal: true
+
 require_relative 'test_helper.rb'
 require './lib/csv_parser'
 require './lib/sales_engine'
 
-require 'pry'
-
 class SalesEngineTest < Minitest::Test
   def setup
-    data = {:merchants => "./data/merchants.csv", :items => "./data/items.csv", :invoices => "./data/invoices.csv", :invoice_items => "./data/invoice_items.csv", :transactions => "./data/transactions.csv", :customers => "./data/customers.csv"}
+    data =
+      {
+        merchants: './data/merchants_test.csv',
+        items: './data/items_test.csv',
+        invoices: './data/invoices_test.csv',
+        invoice_items: './data/invoice_items_test.csv',
+        transactions: './data/transactions_test.csv',
+        customers: './data/customers_test.csv'
+      }
     @sales_engine = SalesEngine.from_csv(data)
   end
 

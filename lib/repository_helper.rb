@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bigdecimal'
 require 'time'
 
@@ -19,7 +21,7 @@ class RepositoryHelper
   end
 
   def generate_new_id
-    (@table.max_by { |row| row.id }).id + 1
+    @table.max_by(&:id).id + 1
   end
 
   def delete(id)
@@ -28,10 +30,10 @@ class RepositoryHelper
   end
 
   def find_by_name(name)
-    @table.find { |row| row.name.downcase == name.downcase }
+    @table.find { |row| row.name.downcase == name.downcase}
   end
 
   def find_all_by_merchant_id(merchant_id)
-    @table.find_all {|row| row.merchant_id == merchant_id}
+    @table.find_all { |row| row.merchant_id == merchant_id }
   end
 end
