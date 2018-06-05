@@ -33,10 +33,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 4, @sa.merchants.length
   end
 
-  def test_it_gets_invoices
-    assert_equal 10, @sa.invoices.length
-  end
-
   def test_it_gets_invoice_items
     assert_equal 10, @sa.invoice_items.length
   end

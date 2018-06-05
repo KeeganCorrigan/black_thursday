@@ -16,10 +16,8 @@ class SalesAnalyst
               :merchants,
               :invoices,
               :invoice_items,
-              :transactions,
               :sales_engine,
-              :invoices_by_merchant,
-              :transactions_by_invoice
+              :invoices_by_merchant
 
   def initialize(sales_engine)
     @sales_engine = sales_engine
