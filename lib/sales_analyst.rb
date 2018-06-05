@@ -6,6 +6,7 @@ require_relative 'item_analyst'
 require_relative 'invoice_analyst'
 require_relative 'merchant_item_analyst'
 require_relative 'merchant_invoice_analyst'
+require_relative 'revenue_analyst'
 require 'bigdecimal'
 require 'date'
 
@@ -17,7 +18,8 @@ class SalesAnalyst
               :invoices,
               :invoice_items,
               :sales_engine,
-              :invoices_by_merchant
+              :invoices_by_merchant,
+              :transactions_by_invoice
 
   def initialize(sales_engine)
     @sales_engine = sales_engine
@@ -135,11 +137,15 @@ class SalesAnalyst
   end
 
   def invoice_paid_in_full?(invoice_id)
-    return false if @transactions_by_invoice[invoice_id].nil?
-    @transactions_by_invoice[invoice_id].any? do |transaction|
-      transaction.result == :success
-    end
+    RevenueAnalyst.new(@sales_engine, @invoices_by_merchant, @transactions_by_invoice).invoice_paid_in_full?(invoice_id)
   end
+
+  # def invoice_paid_in_full?(invoice_id)
+  #   return false if @transactions_by_invoice[invoice_id].nil?
+  #   @transactions_by_invoice[invoice_id].any? do |transaction|
+  #     transaction.result == :success
+  #   end
+  # end
 
   def invoice_total(invoice_id)
     if invoice_paid_in_full?(invoice_id)
