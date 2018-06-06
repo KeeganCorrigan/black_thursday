@@ -1,3 +1,5 @@
+# frozen_string_literal: false
+
 require_relative 'customer_repository'
 require_relative 'data_helper'
 

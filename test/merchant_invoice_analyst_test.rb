@@ -4,7 +4,6 @@ require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/sales_analyst'
 require './lib/merchant_invoice_analyst'
-require 'pry'
 
 class MerchantInvoiceAnalystTest < Minitest::Test
   def setup

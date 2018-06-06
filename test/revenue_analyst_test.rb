@@ -4,10 +4,8 @@ require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/sales_analyst'
 require './lib/revenue_analyst'
-require 'pry'
 
 class RevenueAnalystTest < Minitest::Test
-
   def setup
     data =
       {
@@ -19,7 +17,11 @@ class RevenueAnalystTest < Minitest::Test
       }
     @sales_engine = SalesEngine.from_csv(data)
     @sa = @sales_engine.analyst
-    @ra = RevenueAnalyst.new(@sales_engine, @sa.invoices_by_merchant, @sa.transactions_by_invoice)
+    @ra = RevenueAnalyst.new(
+      @sales_engine,
+      @sa.invoices_by_merchant,
+      @sa.transactions_by_invoice
+    )
   end
 
   def test_it_exists
