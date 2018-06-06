@@ -31,10 +31,22 @@ class SalesAnalyst
     @invoices_by_merchant ||= group_invoices_by_merchant
     @transactions_by_invoice ||= group_transactions_by_invoice
     @item_analyst = ItemAnalyst.new(@items)
-    @merchant_item_analyst = MerchantItemAnalyst.new(@merchants, @items, @sales_engine.merchants)
-    @merchant_invoice_analyst = MerchantInvoiceAnalyst.new(@invoices_by_merchant, @merchants, @invoices)
+    @merchant_item_analyst = MerchantItemAnalyst.new(
+      @merchants,
+      @items,
+      @sales_engine.merchants
+    )
+    @merchant_invoice_analyst = MerchantInvoiceAnalyst.new(
+      @invoices_by_merchant,
+      @merchants,
+      @invoices
+    )
     @invoice_analyst = InvoiceAnalyst.new(@invoices, @invoice_items)
-    @revenue_analyst = RevenueAnalyst.new(@sales_engine, @invoices_by_merchant, @transactions_by_invoice)
+    @revenue_analyst = RevenueAnalyst.new(
+      @sales_engine,
+      @invoices_by_merchant,
+      @transactions_by_invoice
+    )
   end
 
   def group_invoices_by_merchant
@@ -78,7 +90,8 @@ class SalesAnalyst
   end
 
   def merchants_with_only_one_item_registered_in_month(month)
-    @merchant_item_analyst.merchants_with_only_one_item_registered_in_month(month)
+    @merchant_item_analyst
+      .merchants_with_only_one_item_registered_in_month(month)
   end
 
   def average_invoices_per_merchant

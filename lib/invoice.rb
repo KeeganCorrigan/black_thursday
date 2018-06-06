@@ -6,12 +6,13 @@ require_relative 'data_helper.rb'
 class Invoice
   include DataHelper
 
-  attr_reader :id,
-              :customer_id,
-              :merchant_id,
-              :created_at
+  attr_reader   :id,
+                :customer_id,
+                :merchant_id,
+                :created_at
 
-  attr_accessor :status, :updated_at
+  attr_accessor :status,
+                :updated_at
 
   def initialize(information)
     @id = information[:id]

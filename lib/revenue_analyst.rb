@@ -27,19 +27,18 @@ class RevenueAnalyst
   end
 
   def invoice_total(invoice_id)
-    if invoice_paid_in_full?(invoice_id)
-      invoice_by_id = group_invoice_items_by_invoice_id
-      total_price = invoice_by_id[invoice_id].inject(0) do |collector, invoice|
-        collector + (invoice.quantity * invoice.unit_price)
-      end
-      BigDecimal(total_price, 5)
+    return nil unless invoice_paid_in_full?(invoice_id)
+    invoice_by_id = group_invoice_items_by_invoice_id
+    total_price = invoice_by_id[invoice_id].inject(0) do |collector, invoice|
+      collector + (invoice.quantity * invoice.unit_price)
     end
+    BigDecimal(total_price, 5)
   end
 
   def merchants_with_pending_invoices
     @invoices_by_merchant.each_with_object([]) do |(id, invoices), collector|
       invoices.each do |invoice|
-        if invoice_paid_in_full?(invoice.id) == false
+        unless invoice_paid_in_full?(invoice.id)
           collector << @sales_engine.merchants.find_by_id(id)
         end
       end

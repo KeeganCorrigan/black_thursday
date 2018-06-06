@@ -5,8 +5,7 @@ require_relative 'item'
 require_relative 'repository_helper'
 
 class ItemRepository < RepositoryHelper
-  attr_reader :table,
-              :items
+  attr_reader :items
 
   def initialize(items)
     @table ||= create_items(items)

@@ -105,7 +105,7 @@ class ItemRepositoryTest < Minitest::Test
   end
 
   def test_it_creates_items_list
-    assert_equal 'thing1', @mi.table[0].name
+    assert_equal 'thing1', @mi.items[0].name
   end
 
   def test_all_returns_all_items
