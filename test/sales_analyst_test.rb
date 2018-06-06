@@ -76,7 +76,6 @@ class SalesAnalystTest < Minitest::Test
 
   def test_merchants_with_high_item_count
     assert_equal 4, @sa.merchants_with_high_item_count.length
-    assert_equal Merchant, @sa.merchants.first.class
   end
 
   def test_average_item_price_for_merchant

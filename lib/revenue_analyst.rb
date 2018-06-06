@@ -136,8 +136,7 @@ class RevenueAnalyst
   end
 
   def best_item_for_merchant(merchant_id)
-    invoice_by_merchant = find_paid_invoices_per_merchant(merchant_id)
-    paid_invoice_items = find_invoices_by_invoice_id(invoice_by_merchant)
+    paid_invoice_items = find_paid_invoice_items_for_merchant(merchant_id)
     revenue_by_item = find_item_revenue_sold_by_merchant(paid_invoice_items)
     item_id = calculate_highest_revenue_item_by_merchant(revenue_by_item)
     @sales_engine.items.find_by_id(item_id[0])
