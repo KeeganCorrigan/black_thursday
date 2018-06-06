@@ -5,8 +5,7 @@ require_relative 'repository_helper'
 require_relative 'merchant'
 
 class MerchantRepository < RepositoryHelper
-  attr_reader :merchants,
-              :table
+  attr_reader :merchants
 
   def initialize(merchants)
     @table ||= create_merchant(merchants)

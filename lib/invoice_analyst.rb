@@ -7,7 +7,7 @@ class InvoiceAnalyst
   attr_reader :invoices,
               :invoice_items
 
-  def initialize(invoices, invoice_items = nil)
+  def initialize(invoices, invoice_items)
     @invoices = invoices
     @invoice_items = invoice_items
   end

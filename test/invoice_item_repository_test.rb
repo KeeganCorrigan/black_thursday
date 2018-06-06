@@ -3,7 +3,6 @@
 require_relative 'test_helper.rb'
 require './lib/sales_engine'
 require './lib/invoice_item_repository'
-require 'pry'
 
 class InvoiceItemRepositoryTest < Minitest::Test
   def setup

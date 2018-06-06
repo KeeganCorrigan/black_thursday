@@ -5,8 +5,7 @@ require_relative 'repository_helper'
 require_relative 'invoice'
 
 class InvoiceRepository < RepositoryHelper
-  attr_reader :invoices,
-              :table
+  attr_reader :invoices
 
   def initialize(invoices)
     @table ||= create_invoice(invoices)

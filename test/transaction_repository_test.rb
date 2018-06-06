@@ -7,7 +7,7 @@ require 'bigdecimal'
 
 class TransactionRepositoryTest < Minitest::Test
   def setup
-    transaction_info = { transactions: './data/transactions.csv' }
+    transaction_info = { transactions: './data/transactions_test.csv' }
     se = SalesEngine.from_csv(transaction_info)
     @t = se.transactions
     @attributes =
@@ -26,7 +26,7 @@ class TransactionRepositoryTest < Minitest::Test
   end
 
   def test_all
-    assert_equal 4985, @t.all.length
+    assert_equal 10, @t.all.length
   end
 
   def test_find_by_id
@@ -36,13 +36,13 @@ class TransactionRepositoryTest < Minitest::Test
   end
 
   def test_find_all_by_invoice_id
-    expected = @t.find_all_by_invoice_id(2179)
-    assert_equal 2, expected.length
+    expected = @t.find_all_by_invoice_id(1)
+    assert_equal 1, expected.length
     assert_equal Transaction, expected.first.class
   end
 
   def test_find_all_by_credit_card_number
-    expected = @t.find_all_by_credit_card_number('4848466917766329')
+    expected = @t.find_all_by_credit_card_number('4068631943231473')
     assert_equal 1, expected.length
     assert_equal Transaction, expected.first.class
     expected = @t.find_all_by_credit_card_number('4848466917766328')
@@ -51,27 +51,26 @@ class TransactionRepositoryTest < Minitest::Test
 
   def test_find_all_by_result
     expected = @t.find_all_by_result(:success)
-    assert_equal 4158, expected.length
+    assert_equal 9, expected.length
   end
 
   def test_generate_id_for_new_transaction
     expected = @t.generate_id_for_new_transaction
-    assert_equal 4986, expected
+    assert_equal 11, expected
   end
 
   def test_create
     @t.create(@attributes)
-    expected = @t.find_by_id(4986)
+    expected = @t.find_by_id(11)
     assert_equal '4242424242424242', expected.credit_card_number
   end
 
   def test_update
-    @t.create(@attributes)
     attributes = {
       result: :failed
     }
-    @t.update(4986, attributes)
-    expected = @t.find_by_id(4986)
+    @t.update(1, attributes)
+    expected = @t.find_by_id(1)
     assert_equal :failed, expected.result
   end
 

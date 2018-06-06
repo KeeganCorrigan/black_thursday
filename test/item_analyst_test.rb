@@ -96,8 +96,7 @@ class ItemAnalystTest < Minitest::Test
   end
 
   def test_deviation_list_for_items
-    mean = @itema.calculate_mean(@itema.items)
-    expected = @itema.deviation_list_for_items(mean)
+    expected = @itema.deviation_list_for_items(16.0)
     assert_equal 10, expected.length
     assert_equal Array, expected.class
   end

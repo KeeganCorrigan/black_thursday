@@ -11,9 +11,13 @@ class CsvParser
 
   def load_csv(csv_file)
     if csv_file.include?('transactions')
-      CSV.foreach(csv_file, headers: true, header_converters: :symbol).map(&:to_h)
+      CSV.foreach(
+        csv_file, headers: true, header_converters: :symbol
+      ).map(&:to_h)
     else
-      CSV.foreach(csv_file, headers: true, header_converters: :symbol, converters: :all).map(&:to_h)
+      CSV.foreach(
+        csv_file, headers: true, header_converters: :symbol, converters: :all
+      ).map(&:to_h)
     end
   end
 end

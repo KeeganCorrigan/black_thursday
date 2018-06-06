@@ -6,7 +6,6 @@ require './lib/sales_analyst'
 require './lib/invoice_analyst'
 require './lib/invoice_item'
 require './lib/invoice'
-require 'pry'
 
 class InvoiceAnalystTest < Minitest::Test
   def setup

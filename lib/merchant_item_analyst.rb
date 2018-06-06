@@ -12,11 +12,11 @@ class MerchantItemAnalyst
               :merchant_repo
 
   def initialize(merchants, items, merchant_repo = nil)
-    @items_by_merchant = items_by_merchant
     @merchants = merchants
     @items = items
     @merchant_repo = merchant_repo
     @items_by_merchant ||= group_items_by_merchant
+    @standard_deviation ||= average_items_per_merchant_standard_deviation
   end
 
   def group_items_by_merchant
@@ -52,7 +52,7 @@ class MerchantItemAnalyst
 
   def list_of_high_item_count_merchant_ids
     @items_by_merchant.map do |merchant_id, merchant|
-      if merchant.count > (average_items_per_merchant_standard_deviation * 2)
+      if merchant.count > (@standard_deviation * 2)
         merchant_id
       end
     end.compact.uniq

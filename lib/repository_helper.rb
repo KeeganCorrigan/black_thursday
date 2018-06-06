@@ -9,7 +9,7 @@ class RepositoryHelper
   end
 
   def inspect
-    "#<#{self.class} #{@items.size} rows>"
+    "#<#{self.class} #{@table.size} rows>"
   end
 
   def all
@@ -30,7 +30,7 @@ class RepositoryHelper
   end
 
   def find_by_name(name)
-    @table.find { |row| row.name.downcase == name.downcase}
+    @table.find { |row| row.name.downcase == name.downcase }
   end
 
   def find_all_by_merchant_id(merchant_id)
