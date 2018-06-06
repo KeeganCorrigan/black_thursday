@@ -37,10 +37,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 10, @sa.invoice_items.length
   end
 
-  def test_group_invoice_items_by_invoice_id
-    assert_equal 10, @sa.group_invoice_items_by_invoice_id.length
-  end
-
   def test_average_items_per_merchant
     assert_equal 2.5, @sa.average_items_per_merchant
     assert_equal Float, @sa.average_items_per_merchant.class
@@ -178,19 +174,6 @@ class SalesAnalystTest < Minitest::Test
     assert_equal 1, @sa.merchants_with_pending_invoices.length
   end
 
-  def test_merchants_by_revenue
-    expected = @sa.merchants_by_revenue
-    assert_equal Hash, expected.class
-    assert_equal 2780.91, expected[1].to_f
-    assert_equal 8395.52, expected[2].to_f
-  end
-
-  def test_sort_merchants_by_revenue
-    expected = @sa.sort_merchants_by_revenue
-    assert_equal 74.36, expected[4]
-    assert_equal 2780.91, expected[1]
-  end
-
   def test_top_revenue_earners
     expected = @sa.top_revenue_earners
     assert_equal Merchant, expected.first.class
@@ -216,44 +199,9 @@ class SalesAnalystTest < Minitest::Test
     assert_equal Array, expected.class
   end
 
-  def test_find_paid_invoices_per_merchant
-    expected = @sa.find_paid_invoices_per_merchant(1)
-    assert_equal 2, expected.length
-    assert_equal Invoice, expected.first.class
-  end
-
-  def test_find_invoices_by_invoice_id
-    invoice_per_merchant = @sa.find_paid_invoices_per_merchant(1)
-    expected = @sa.find_invoices_by_invoice_id(invoice_per_merchant)
-    assert_equal Array, expected.class
-    assert_equal InvoiceItem, expected.first.class
-  end
-
-  def test_find_item_quantities_sold_by_merchant
-    invoice_per_merchant = @sa.find_paid_invoices_per_merchant(1)
-    invoice_id = @sa.find_invoices_by_invoice_id(invoice_per_merchant)
-    expected = @sa.find_item_quantities_sold_by_merchant(invoice_id)
-    assert_equal Hash, expected.class
-    assert_equal 9, expected[2]
-  end
-
   def test_most_sold_item_for_merchant
     expected = @sa.most_sold_item_for_merchant(1)
     assert_equal 2, expected[0].id
-  end
-
-  def test_find_item_revenue_sold_by_merchant
-    invoice_per_merchant = @sa.find_paid_invoices_per_merchant(1)
-    invoice_id = @sa.find_invoices_by_invoice_id(invoice_per_merchant)
-    expected = @sa.find_item_revenue_sold_by_merchant(invoice_id)
-    assert_equal 681.75, expected[1]
-  end
-
-  def test_calculate_highest_revenue_item_by_merchant
-    items = { '1': 681.75, '2': 987.60 }
-    expected = @sa.calculate_highest_revenue_item_by_merchant(items)
-    assert_equal 987.60, expected[1]
-    assert_equal 2, expected.length
   end
 
   def test_best_item_for_merchant
